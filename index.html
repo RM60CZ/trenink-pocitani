@@ -5,74 +5,184 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trénink počítání</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f8f9fa;
-      margin: 0; padding: 20px;
-      display: flex; flex-direction: column; align-items: center;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
     }
+
     .container {
-      background: white; padding: 25px; border-radius: 16px;
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      width: 95%; max-width: 500px; text-align: center;
+      width: 95%;
+      max-width: 500px;
+      text-align: center;
     }
-    h1 { color: #3498db; margin-top: 0; font-size: 1.8rem; }
+
+    h1 {
+      color: #3498db;
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
     .controls {
-      margin: 20px 0; display: flex; flex-wrap: wrap;
-      justify-content: center; align-items: flex-end; gap: 12px;
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 12px;
     }
+
     .control-group {
-      display: flex; flex-direction: column; align-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    label, .label-top, .label-bottom {
-      font-weight: bold; color: #34495e; font-size: 0.9rem;
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #34495e;
     }
-    .label-top { line-height: 1.3; }
-    .label-bottom { margin-bottom: 6px; }
+
+    .label-top {
+      font-weight: bold;
+      color: #34495e;
+      line-height: 1.3;
+      font-size: 0.9rem;
+    }
+
+    .label-bottom {
+      font-weight: bold;
+      color: #34495e;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
     select {
-      padding: 8px 6px; font-size: 1rem; border: 1px solid #ccc;
-      border-radius: 8px; width: 60px;
+      padding: 8px 6px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      width: 60px;
     }
-    #operace { width: 70px; }
+
+    #operace {
+      width: 70px;
+    }
+
     button {
-      padding: 10px 14px; font-size: 1rem; border: none; border-radius: 8px;
-      background-color: #3498db; color: white; cursor: pointer;
-      font-weight: bold; min-width: 120px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+      min-width: 120px;
     }
-    button:hover { background-color: #2980b9; }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
     .priklad-oblast {
-      margin: 0 auto 15px; min-height: 200px;
-      display: flex; flex-direction: column; align-items: center;
+      margin: 0 auto 15px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
       width: fit-content;
     }
-    .example, .cara, .result-line {
-      font-family: monospace; font-size: 2.0rem; line-height: 1.4;
-      white-space: pre; text-align: right;
+
+    .example,
+    .cara,
+    .result-line {
+      font-family: monospace;
+      font-size: 2.0rem;
+      line-height: 1.4;
+      white-space: pre;
+      text-align: right;
     }
-    .cara { color: #2c3e50; visibility: hidden; }
-    .result-line { color: #27ae60; font-weight: bold; visibility: hidden; }
+
+    .cara {
+      color: #2c3e50;
+      visibility: hidden;
+    }
+
+    .result-line {
+      color: #27ae60;
+      font-weight: bold;
+      visibility: hidden;
+    }
+
     .odpoved-oblast {
-      margin: 15px 0; display: flex; flex-direction: column;
-      align-items: center; gap: 8px;
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
+
     .odpoved-oblast label {
-      font-weight: normal; font-size: 1rem; color: #555;
+      font-weight: normal;
+      font-size: 1rem;
+      color: #555;
     }
+
     #odpoved {
-      padding: 10px; font-size: 1.2rem; text-align: center;
-      border: 2px solid #ccc; border-radius: 8px; width: 180px;
+      padding: 10px;
+      font-size: 1.2rem;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      width: 180px;
       transition: border-color 0.3s, background-color 0.3s;
     }
-    #odpoved.zelene { background-color: #d4edda; border-color: #28a745; }
-    #odpoved.cervene { background-color: #f8d7da; border-color: #dc3545; }
-    .error {
-      color: #e74c3c; font-weight: bold; margin: 15px 0; min-height: 24px;
+
+    #odpoved.zelene {
+      background-color: #d4edda;
+      border-color: #28a745;
     }
+
+    #odpoved.cervene {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 15px 0;
+      min-height: 24px;
+    }
+
     @media (max-width: 600px) {
-      .example, .cara, .result-line { font-size: 1.6rem; }
-      #odpoved { width: 150px; font-size: 1.1rem; }
+      .example,
+      .cara,
+      .result-line {
+        font-size: 1.6rem;
+      }
+      #odpoved {
+        width: 150px;
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
@@ -90,11 +200,13 @@
           <option value="/">÷</option>
         </select>
       </div>
+
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">1. čísla:</span>
         <select id="cislice1"></select>
       </div>
+
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">2. čísla:</span>
@@ -148,14 +260,14 @@
     let zobrazitVysledek = false;
 
     // === DOM elementy ===
-    const operaceEl = document.getElementById('operace');
+    const operaceEl  = document.getElementById('operace');
     const cislice1El = document.getElementById('cislice1');
     const cislice2El = document.getElementById('cislice2');
-    const chybaEl = document.getElementById('chyba');
-    const prikladEl = document.getElementById('priklad');
-    const caraEl = document.getElementById('cara');
+    const chybaEl    = document.getElementById('chyba');
+    const prikladEl  = document.getElementById('priklad');
+    const caraEl     = document.getElementById('cara');
     const vysledekEl = document.getElementById('vysledek');
-    const odpovedEl = document.getElementById('odpoved');
+    const odpovedEl  = document.getElementById('odpoved');
     const tlacitkoEl = document.getElementById('tlacitko');
 
     // === Naplnění selectů ===
@@ -264,11 +376,7 @@
             const num = parseFloat(norm);
             spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
           }
-          if (spravne) {
-            odpovedEl.classList.add('zelene');
-          } else {
-            odpovedEl.classList.add('cervene');
-          }
+          odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
           zobrazVysledek(aktualniPriklad);
         }
         tlacitkoEl.textContent = 'START';
@@ -279,7 +387,7 @@
     // === Události ===
     tlacitkoEl.addEventListener('click', handleTlacitko);
 
-    // Enter na tlačítku START (když má fokus)
+    // Enter na tlačítku (když má fokus)
     tlacitkoEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -287,9 +395,10 @@
       }
     });
 
-    // Enter ve vstupním poli = VÝSLEDEK
+    // Enter ve vstupním poli
     odpovedEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && zobrazitVysledek) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
         handleTlacitko();
       }
     });
