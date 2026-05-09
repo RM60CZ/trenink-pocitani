@@ -28,19 +28,16 @@
       width: 95%;
       max-width: 500px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
     }
 
     h1 {
       color: #3498db;
       margin-top: 0;
       font-size: 1.8rem;
-      margin-bottom: 10px;
     }
 
     .controls {
-      margin: 0 0 5px 0;
+      margin: 20px 0;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -104,16 +101,8 @@
       background-color: #2980b9;
     }
 
-    .error {
-      color: #e74c3c;
-      font-weight: bold;
-      margin: 2px 0 2px 0;
-      min-height: 0;
-      font-size: 0.9rem;
-    }
-
     .priklad-oblast {
-      margin: 5px auto 2px;
+      margin: 5px auto 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -126,7 +115,7 @@
     .result-line {
       font-family: monospace;
       font-size: 2.0rem;
-      line-height: 1.2;
+      line-height: 1.4;
       white-space: pre;
       text-align: right;
     }
@@ -143,17 +132,10 @@
     }
 
     .odpoved-oblast {
-      margin: 5px 0 8px;
+      margin: 10px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-    }
-
-    .odpoved-oblast label {
-      font-weight: normal;
-      font-size: 1rem;
-      color: #555;
     }
 
     #odpoved {
@@ -174,6 +156,13 @@
     #odpoved.cervene {
       background-color: #f8d7da;
       border-color: #dc3545;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 10px 0;
+      min-height: 24px;
     }
 
     @media (max-width: 600px) {
@@ -226,8 +215,7 @@
     </div>
 
     <div class="odpoved-oblast">
-      <label>Vaše odpověď:</label>
-      <input type="text" id="odpoved" autocomplete="off" />
+      <input type="text" id="odpoved" autocomplete="off" placeholder="Vaše odpověď" />
     </div>
 
     <button id="tlacitko">START</button>
@@ -386,6 +374,20 @@
         zobrazitVysledek = false;
       }
     }
+
+    // === Smazání placeholderu při fokusu ===
+    odpovedEl.addEventListener('focus', () => {
+      if (odpovedEl.value === '') {
+        odpovedEl.placeholder = '';
+      }
+    });
+
+    // === Obnovení placeholderu při ztrátě fokusu ===
+    odpovedEl.addEventListener('blur', () => {
+      if (odpovedEl.value === '') {
+        odpovedEl.placeholder = 'Vaše odpověď';
+      }
+    });
 
     // === Události ===
     tlacitkoEl.addEventListener('click', handleTlacitko);
