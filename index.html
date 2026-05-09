@@ -22,7 +22,7 @@
 
     .container {
       background: white;
-      padding: 15px 20px;
+      padding: 20px;
       border-radius: 16px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
       width: 95%;
@@ -33,12 +33,12 @@
     h1 {
       color: #3498db;
       margin-top: 0;
-      margin-bottom: 12px;
-      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-size: 1.5rem;
     }
 
     .controls {
-      margin: 0 0 8px 0;
+      margin: 4px 0 2px 0;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -56,25 +56,26 @@
       font-weight: bold;
       margin-bottom: 4px;
       color: #34495e;
+      font-size: 0.8rem;
     }
 
     .label-top {
       font-weight: bold;
       color: #34495e;
       line-height: 1.2;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     .label-bottom {
       font-weight: bold;
       color: #34495e;
       margin-bottom: 4px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     select {
       padding: 6px 4px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       background: white;
@@ -86,8 +87,8 @@
     }
 
     button {
-      padding: 8px 14px;
-      font-size: 1rem;
+      padding: 8px 12px;
+      font-size: 0.9rem;
       border: none;
       border-radius: 8px;
       background-color: #3498db;
@@ -95,58 +96,84 @@
       cursor: pointer;
       font-weight: bold;
       transition: background 0.2s;
-      min-width: 120px;
-      margin-top: 6px;
+      height: 100%;
+      white-space: nowrap;
     }
 
     button:hover {
       background-color: #2980b9;
     }
 
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 2px 0 0 0;
+      min-height: 0;
+      font-size: 0.8rem;
+    }
+
     .priklad-oblast {
-      margin: 0 auto 6px;
+      margin: 0 auto 2px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       width: fit-content;
+      gap: 0px;
     }
 
-    .example,
-    .cara,
-    .result-line {
+    .example {
       font-family: monospace;
-      font-size: 2.0rem;
-      line-height: 1.2;
+      font-size: 2.2rem;
+      line-height: 1.1;
       white-space: pre;
       text-align: right;
+      margin: 0;
+      padding: 0;
     }
 
     .cara {
+      font-family: monospace;
+      font-size: 2.2rem;
+      line-height: 1;
       color: #2c3e50;
       visibility: hidden;
+      margin: 0;
+      padding: 0;
     }
 
     .result-line {
+      font-family: monospace;
+      font-size: 2.2rem;
+      line-height: 1.1;
       color: #27ae60;
       font-weight: bold;
       visibility: hidden;
+      margin: 0;
+      padding: 0;
     }
 
     .odpoved-oblast {
-      margin: 6px 0 2px;
+      margin: 4px 0 0 0;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      align-items: stretch;
+      gap: 8px;
+      width: 100%;
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #odpoved {
-      padding: 8px;
+      padding: 8px 10px;
       font-size: 1.2rem;
       text-align: center;
       border: 2px solid #ccc;
       border-radius: 8px;
       width: 180px;
       transition: border-color 0.3s, background-color 0.3s;
+      height: 100%;
     }
 
     #odpoved.zelene {
@@ -159,19 +186,11 @@
       border-color: #dc3545;
     }
 
-    .error {
-      color: #e74c3c;
-      font-weight: bold;
-      margin: 0 0 4px 0;
-      min-height: 0;
-      font-size: 0.9rem;
-    }
-
     @media (max-width: 600px) {
       .example,
       .cara,
       .result-line {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
       }
       #odpoved {
         width: 150px;
@@ -217,10 +236,9 @@
     </div>
 
     <div class="odpoved-oblast">
-      <input type="text" id="odpoved" autocomplete="off" placeholder="Vaše odpověď" />
+      <button id="tlacitko">START</button>
+      <input type="text" id="odpoved" autocomplete="off" placeholder="Odpověď" />
     </div>
-
-    <button id="tlacitko">START</button>
   </div>
 
   <script>
@@ -376,20 +394,6 @@
         zobrazitVysledek = false;
       }
     }
-
-    // === Smazání placeholderu při fokusu ===
-    odpovedEl.addEventListener('focus', () => {
-      if (odpovedEl.value === '') {
-        odpovedEl.placeholder = '';
-      }
-    });
-
-    // === Obnovení placeholderu při ztrátě fokusu ===
-    odpovedEl.addEventListener('blur', () => {
-      if (odpovedEl.value === '') {
-        odpovedEl.placeholder = 'Vaše odpověď';
-      }
-    });
 
     // === Události ===
     tlacitkoEl.addEventListener('click', handleTlacitko);
