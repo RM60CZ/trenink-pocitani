@@ -103,41 +103,32 @@
 
     .priklad-oblast {
       margin: 25px auto;
-      min-height: 180px;
+      min-height: 200px;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start; /* Změna: zarovnání doleva */
       justify-content: flex-start;
       width: fit-content;
     }
 
-    .example {
+    .example,
+    .cara,
+    .result-line {
       font-family: monospace;
-      font-size: 1.6rem;
-      line-height: 1.6;
-      text-align: right;
+      font-size: 2.0rem; /* ZVĚTŠENO z 1.6rem */
+      line-height: 1.4;
       white-space: pre;
     }
 
     .cara {
-      font-family: monospace;
-      font-size: 1.6rem;
-      text-align: right;
-      white-space: pre;
       color: #2c3e50;
-      line-height: 1.0;
       visibility: hidden;
     }
 
     .result-line {
-      font-family: monospace;
-      font-size: 1.6rem;
-      text-align: right;
       color: #27ae60;
       font-weight: bold;
-      white-space: pre;
       visibility: hidden;
-      line-height: 1.6;
     }
 
     .error {
@@ -148,8 +139,10 @@
     }
 
     @media (max-width: 600px) {
-      .example, .result-line, .cara {
-        font-size: 1.3rem;
+      .example,
+      .cara,
+      .result-line {
+        font-size: 1.6rem; /* Mobilní verze také zvětšena */
       }
     }
   </style>
@@ -292,19 +285,17 @@
       const f1 = formatujCislo(cislo1);
       const f2 = formatujCislo(cislo2);
 
-      // maxDelka zahrnuje i budoucí výsledek aby se šířka nezměnila
       const maxDelka = spocitejMaxDelku(priklad);
       const radek1 = f1.padStart(maxDelka);
       const radek2 = operace + ' ' + f2.padStart(maxDelka - 2);
 
       document.getElementById('priklad').textContent = radek1 + '\n' + radek2;
 
-      // čára skrytá ale rezervuje místo
+      // Čára i výsledek rezervují prostor, ale jsou skryté
       const caraEl = document.getElementById('cara');
       caraEl.textContent = '─'.repeat(maxDelka);
       caraEl.style.visibility = 'hidden';
 
-      // výsledek skrytý ale rezervuje místo
       const vysledekEl = document.getElementById('vysledek');
       vysledekEl.textContent = ' '.repeat(maxDelka);
       vysledekEl.style.visibility = 'hidden';
