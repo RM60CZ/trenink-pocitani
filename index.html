@@ -102,11 +102,11 @@
     }
 
     .priklad-oblast {
-      margin: 0 auto 15px; /* ještě výš – horní margin = 0 */
+      margin: 0 auto 15px;
       min-height: 200px;
       display: flex;
       flex-direction: column;
-      align-items: center; /* střed – ne "flex-start"! */
+      align-items: center;
       justify-content: flex-start;
       width: fit-content;
     }
@@ -118,7 +118,7 @@
       font-size: 2.0rem;
       line-height: 1.4;
       white-space: pre;
-      text-align: right; /* zarovnání čísel vpravo uvnitř bloku */
+      text-align: right;
     }
 
     .cara {
@@ -251,8 +251,22 @@
       sel2.value = '1';
     }
 
+    // Formátování čísel s mezerami jako oddělovači tisíců
     function formatujCislo(cislo) {
-      return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      if (typeof cislo === 'bigint') {
+        return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      }
+      if (typeof cislo === 'number') {
+        if (Number.isInteger(cislo)) {
+          return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        } else {
+          // Desetinné číslo: formátujeme jen celou část
+          const [cela, desetinna] = cislo.toString().split('.');
+          const celaFormatovana = cela.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+          return desetinna ? `${celaFormatovana}.${desetinna}` : celaFormatovana;
+        }
+      }
+      return cislo.toString();
     }
 
     function generujCislo(pocetCislic) {
@@ -305,18 +319,13 @@
       if (operace === '+') vysledek = cislo1 + cislo2;
       else if (operace === '-') vysledek = cislo1 - cislo2;
       else if (operace === '*') vysledek = BigInt(cislo1) * BigInt(cislo2);
-      else if (operace === '/') vysledek = cislo1 / cislo2; // uložíme jako number
+      else if (operace === '/') vysledek = cislo1 / cislo2;
 
       return { cislo1, cislo2, operace, vysledek };
     }
 
     function spocitejMaxDelku(priklad) {
-      const fVysledek = typeof priklad.vysledek === 'bigint'
-        ? formatujCislo(priklad.vysledek)
-        : (typeof priklad.vysledek === 'number'
-            ? priklad.vysledek.toFixed(6).replace(/\.?0+$/, '') // odstraní koncové nuly
-            : formatujCislo(priklad.vysledek));
-
+      const fVysledek = formatujCislo(priklad.vysledek);
       return Math.max(
         formatujCislo(priklad.cislo1).length,
         (priklad.operace + ' ' + formatujCislo(priklad.cislo2)).length,
@@ -345,12 +354,7 @@
     }
 
     function zobrazVysledek(priklad) {
-      const fVysledek = typeof priklad.vysledek === 'bigint'
-        ? formatujCislo(priklad.vysledek)
-        : (typeof priklad.vysledek === 'number'
-            ? priklad.vysledek.toFixed(6).replace(/\.?0+$/, '')
-            : formatujCislo(priklad.vysledek));
-
+      const fVysledek = formatujCislo(priklad.vysledek);
       const maxDelka = spocitejMaxDelku(priklad);
 
       const caraEl = document.getElementById('cara');
@@ -362,26 +366,33 @@
       vysledekEl.style.visibility = 'visible';
     }
 
-    function normalizujDesetinnaCisla(vstup) {
-      // Povolíme čárku i tečku – nahradíme čárku tečkou pro parseFloat
-      return vstup.trim().replace(',', '.');
+    // Normalizace uživatelské odpovědi: odstraní mezery, nahradí čárku tečkou
+    function normalizujOdpoved(vstup) {
+      return vstup
+        .trim()
+        .replace(/\s+/g, '')   // odstraní všechny mezery
+        .replace(',', '.');    // čárka → tečka
     }
 
     function porovnejOdpoved(uzivatelskaOdpoved, spravnyVysledek, operace) {
-      if (uzivatelskaOdpoved === '') return null;
+      if (uzivatelskaOdpoved.trim() === '') return null;
 
-      const normalizovana = normalizujDesetinnaCisla(uzivatelskaOdpoved);
-      const cislo = parseFloat(normalizovana);
-
-      if (isNaN(cislo)) return false;
+      const normalizovana = normalizujOdpoved(uzivatelskaOdpoved);
+      if (normalizovana === '') return false;
 
       if (typeof spravnyVysledek === 'bigint') {
-        return BigInt(cislo) === spravnyVysledek;
+        try {
+          const uzivBigInt = BigInt(normalizovana);
+          return uzivBigInt === spravnyVysledek;
+        } catch {
+          return false;
+        }
       }
 
       if (typeof spravnyVysledek === 'number') {
-        // Pro dělení povolíme malou toleranci
-        return Math.abs(cislo - spravnyVysledek) < 1e-9;
+        const uzivCislo = parseFloat(normalizovana);
+        if (isNaN(uzivCislo)) return false;
+        return Math.abs(uzivCislo - spravnyVysledek) < 1e-9;
       }
 
       return false;
@@ -393,7 +404,6 @@
       const tlacitko = document.getElementById('tlacitko');
       const odpovedEl = document.getElementById('odpoved');
 
-      // Reset barvy při každém kliku
       odpovedEl.classList.remove('zelene', 'cervene');
 
       if (!zobrazitVysledek) {
@@ -405,25 +415,25 @@
         }
         aktualniPriklad = priklad;
         zobrazPriklad(priklad);
-        odpovedEl.value = ''; // vymažeme předchozí odpověď
+        odpovedEl.value = '';
         tlacitko.textContent = 'VÝSLEDEK';
         zobrazitVysledek = true;
+        // ✅ Fokus do pole po START
+        setTimeout(() => odpovedEl.focus(), 10);
       } else {
-        // Uživatel stiskl "VÝSLEDEK"
-        const uzivOdpoved = odpovedEl.value.trim();
+        const uzivOdpoved = odpovedEl.value;
 
-        if (uzivOdpoved === '') {
-          // Prázdné → prostě zobraz výsledek
+        if (uzivOdpoved.trim() === '') {
+          // Prázdné → ukáž výsledek bez barvy
           zobrazVysledek(aktualniPriklad);
         } else {
-          // Něco je vyplněné → vyhodnoť
+          // Vyplněné → vyhodnoť
           const jeSpravne = porovnejOdpoved(uzivOdpoved, aktualniPriklad.vysledek, aktualniPriklad.operace);
           if (jeSpravne === true) {
             odpovedEl.classList.add('zelene');
           } else if (jeSpravne === false) {
             odpovedEl.classList.add('cervene');
           }
-          // Zobrazíme výsledek vždy
           zobrazVysledek(aktualniPriklad);
         }
 
@@ -432,7 +442,7 @@
       }
     });
 
-    // Enter v poli odpověď spustí "VÝSLEDEK"
+    // Enter v poli spustí VÝSLEDEK
     document.getElementById('odpoved').addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && zobrazitVysledek) {
         document.getElementById('tlacitko').click();
