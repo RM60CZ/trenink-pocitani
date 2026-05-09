@@ -56,6 +56,18 @@
       color: #34495e;
     }
 
+    .label-top {
+      font-weight: bold;
+      color: #34495e;
+      line-height: 1.3;
+    }
+
+    .label-bottom {
+      font-weight: bold;
+      color: #34495e;
+      margin-bottom: 6px;
+    }
+
     select, button {
       padding: 10px 14px;
       font-size: 1rem;
@@ -100,6 +112,8 @@
       font-family: monospace;
       font-size: 1.6rem;
       text-align: right;
+      color: #27ae60;
+      font-weight: bold;
     }
 
     @media (max-width: 600px) {
@@ -129,14 +143,16 @@
       </div>
 
       <div class="control-group">
-        <label for="cislice1">Číslice 1. čísla:</label>
+        <span class="label-top">Počet číslic</span>
+        <span class="label-bottom">1. čísla:</span>
         <select id="cislice1">
           <!-- Naplní se skriptem -->
         </select>
       </div>
 
       <div class="control-group">
-        <label for="cislice2">Číslice 2. čísla:</label>
+        <span class="label-top">Počet číslic</span>
+        <span class="label-bottom">2. čísla:</span>
         <select id="cislice2">
           <!-- Naplní se skriptem -->
         </select>
@@ -152,7 +168,6 @@
   </div>
 
   <script>
-    // Naplní výběry číslic 1–9
     function naplnCislice() {
       const sel1 = document.getElementById('cislice1');
       const sel2 = document.getElementById('cislice2');
@@ -173,12 +188,10 @@
       sel2.value = '1';
     }
 
-    // Formátování čísla s mezerami každé 3 číslice zprava
     function formatujCislo(cislo) {
       return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
-    // Generování náhodného čísla s daným počtem číslic
     function generujCislo(pocetCislic) {
       const min = Math.pow(10, pocetCislic - 1);
       const max = Math.pow(10, pocetCislic) - 1;
@@ -195,7 +208,6 @@
       const chybaEl = document.getElementById('chyba');
       chybaEl.textContent = '';
 
-      // Kontrola: u odčítání musí mít 1. číslo více číslic nebo být větší
       if (operace === '-' && pocet1 < pocet2) {
         chybaEl.textContent = '❌ Nelze: 1. číslo má méně číslic → výsledek by byl záporný.';
         return null;
@@ -209,14 +221,12 @@
         pokusy++;
         cislo1 = generujCislo(pocet1);
 
-        // Pro 2. číslo: pokud má 1 číslici, generujeme 2–9 (aby nebylo 0 ani 1)
         if (pocet2 === 1) {
-          cislo2 = Math.floor(Math.random() * 8) + 2; // 2 až 9
+          cislo2 = Math.floor(Math.random() * 8) + 2;
         } else {
           cislo2 = generujCislo(pocet2);
         }
 
-        // Dodatečné podmínky
         if (operace === '-' && cislo1 <= cislo2) continue;
         if (operace === '/' && cislo2 === 0) continue;
 
@@ -228,7 +238,6 @@
         return null;
       }
 
-      // Výpočet výsledku
       let vysledek;
       if (operace === '+') vysledek = cislo1 + cislo2;
       else if (operace === '-') vysledek = cislo1 - cislo2;
@@ -265,7 +274,6 @@
       document.getElementById('vysledek').textContent = fVysledek.padStart(maxDelka);
     }
 
-    // Logika tlačítka
     let zobrazitVysledek = false;
 
     document.getElementById('tlacitko').addEventListener('click', () => {
@@ -288,7 +296,6 @@
       }
     });
 
-    // Inicializace
     naplnCislice();
     document.getElementById('operace').value = '+';
   </script>
