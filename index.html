@@ -26,12 +26,12 @@
       border-radius: 16px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
       width: 95%;
-      max-width: 700px;
+      max-width: 500px;
       text-align: center;
     }
 
     h1 {
-      color: #27ae60;
+      color: #3498db;
       margin-top: 0;
       font-size: 1.8rem;
     }
@@ -42,7 +42,7 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: flex-end;
-      gap: 15px;
+      gap: 12px;
     }
 
     .control-group {
@@ -61,26 +61,36 @@
       font-weight: bold;
       color: #34495e;
       line-height: 1.3;
+      font-size: 0.9rem;
     }
 
     .label-bottom {
       font-weight: bold;
       color: #34495e;
       margin-bottom: 6px;
+      font-size: 0.9rem;
     }
 
-    select, button {
-      padding: 10px 14px;
+    select {
+      padding: 8px 6px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       background: white;
+      width: 60px;
+    }
+
+    #operace {
+      width: 70px;
     }
 
     button {
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
       background-color: #3498db;
       color: white;
-      border: none;
       cursor: pointer;
       font-weight: bold;
       transition: background 0.2s;
@@ -92,12 +102,13 @@
     }
 
     .priklad-oblast {
-      margin: 25px 0;
-      min-height: 160px;
+      margin: 25px auto;
+      min-height: 180px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      justify-content: flex-end;
+      justify-content: flex-start;
+      width: fit-content;
     }
 
     .example {
@@ -106,7 +117,6 @@
       line-height: 1.6;
       text-align: right;
       white-space: pre;
-      direction: ltr;
     }
 
     .cara {
@@ -115,7 +125,7 @@
       text-align: right;
       white-space: pre;
       color: #2c3e50;
-      line-height: 1.2;
+      line-height: 1.0;
       visibility: hidden;
     }
 
@@ -127,6 +137,7 @@
       font-weight: bold;
       white-space: pre;
       visibility: hidden;
+      line-height: 1.6;
     }
 
     .error {
@@ -137,10 +148,6 @@
     }
 
     @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        align-items: center;
-      }
       .example, .result-line, .cara {
         font-size: 1.3rem;
       }
@@ -179,7 +186,7 @@
 
     <div class="priklad-oblast">
       <div class="example" id="priklad">Zatím žádný příklad</div>
-      <div class="cara" id="cara">──────────</div>
+      <div class="cara" id="cara"></div>
       <div class="result-line" id="vysledek"></div>
     </div>
 
@@ -257,7 +264,6 @@
         return null;
       }
 
-      // Použití BigInt pro přesné násobení
       let vysledek;
       if (operace === '+') vysledek = cislo1 + cislo2;
       else if (operace === '-') vysledek = cislo1 - cislo2;
@@ -267,41 +273,57 @@
       return { cislo1, cislo2, operace, vysledek };
     }
 
+    function spocitejMaxDelku(priklad) {
+      const fVysledek = typeof priklad.vysledek === 'bigint'
+        ? formatujCislo(priklad.vysledek)
+        : (typeof priklad.vysledek === 'string'
+            ? priklad.vysledek
+            : formatujCislo(priklad.vysledek));
+
+      return Math.max(
+        formatujCislo(priklad.cislo1).length,
+        (priklad.operace + ' ' + formatujCislo(priklad.cislo2)).length,
+        fVysledek.length
+      );
+    }
+
     function zobrazPriklad(priklad) {
       const { cislo1, cislo2, operace } = priklad;
       const f1 = formatujCislo(cislo1);
       const f2 = formatujCislo(cislo2);
 
-      const maxDelka = Math.max(f1.length, f2.length + 2);
+      // maxDelka zahrnuje i budoucí výsledek aby se šířka nezměnila
+      const maxDelka = spocitejMaxDelku(priklad);
       const radek1 = f1.padStart(maxDelka);
       const radek2 = operace + ' ' + f2.padStart(maxDelka - 2);
 
       document.getElementById('priklad').textContent = radek1 + '\n' + radek2;
-      document.getElementById('cara').style.visibility = 'hidden';
-      document.getElementById('vysledek').style.visibility = 'hidden';
-      document.getElementById('vysledek').textContent = '';
+
+      // čára skrytá ale rezervuje místo
+      const caraEl = document.getElementById('cara');
+      caraEl.textContent = '─'.repeat(maxDelka);
+      caraEl.style.visibility = 'hidden';
+
+      // výsledek skrytý ale rezervuje místo
+      const vysledekEl = document.getElementById('vysledek');
+      vysledekEl.textContent = ' '.repeat(maxDelka);
+      vysledekEl.style.visibility = 'hidden';
     }
 
     function zobrazVysledek(priklad) {
       const fVysledek = typeof priklad.vysledek === 'bigint'
         ? formatujCislo(priklad.vysledek)
         : (typeof priklad.vysledek === 'string'
-          ? priklad.vysledek
-          : formatujCislo(priklad.vysledek));
+            ? priklad.vysledek
+            : formatujCislo(priklad.vysledek));
 
-      const maxDelka = Math.max(
-        formatujCislo(priklad.cislo1).length,
-        (priklad.operace + ' ' + formatujCislo(priklad.cislo2)).length,
-        fVysledek.length
-      );
+      const maxDelka = spocitejMaxDelku(priklad);
 
       const caraEl = document.getElementById('cara');
-      const vysledekEl = document.getElementById('vysledek');
-
-      // Čára ze znaků ─ ve stejné šířce jako čísla
       caraEl.textContent = '─'.repeat(maxDelka);
       caraEl.style.visibility = 'visible';
 
+      const vysledekEl = document.getElementById('vysledek');
       vysledekEl.textContent = fVysledek.padStart(maxDelka);
       vysledekEl.style.visibility = 'visible';
     }
