@@ -102,11 +102,11 @@
     }
 
     .priklad-oblast {
-      margin: -25px auto 25px; /* JEŠTĚ VÝŠ: -25px nahoře */
-      min-height: 220px;
+      margin: 0 auto 15px; /* ještě výš – horní margin = 0 */
+      min-height: 200px;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center; /* střed – ne "flex-start"! */
       justify-content: flex-start;
       width: fit-content;
     }
@@ -118,6 +118,7 @@
       font-size: 2.0rem;
       line-height: 1.4;
       white-space: pre;
+      text-align: right; /* zarovnání čísel vpravo uvnitř bloku */
     }
 
     .cara {
@@ -131,18 +132,38 @@
       visibility: hidden;
     }
 
-    .odpoved-input {
-      margin-top: 12px;
-      padding: 8px 10px;
-      font-size: 1.4rem;
-      font-family: monospace;
-      width: 100%;
-      max-width: 300px;
-      text-align: right;
+    .odpoved-oblast {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .odpoved-oblast label {
+      font-weight: normal;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    #odpoved {
+      padding: 10px;
+      font-size: 1.2rem;
+      text-align: center;
       border: 2px solid #ccc;
       border-radius: 8px;
-      outline: none;
-      transition: border-color 0.2s, background-color 0.2s;
+      width: 180px;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+
+    #odpoved.zelene {
+      background-color: #d4edda;
+      border-color: #28a745;
+    }
+
+    #odpoved.cervene {
+      background-color: #f8d7da;
+      border-color: #dc3545;
     }
 
     .error {
@@ -155,9 +176,12 @@
     @media (max-width: 600px) {
       .example,
       .cara,
-      .result-line,
-      .odpoved-input {
+      .result-line {
         font-size: 1.6rem;
+      }
+      #odpoved {
+        width: 150px;
+        font-size: 1.1rem;
       }
     }
   </style>
@@ -196,7 +220,11 @@
       <div class="example" id="priklad">Zatím žádný příklad</div>
       <div class="cara" id="cara"></div>
       <div class="result-line" id="vysledek"></div>
-      <input type="text" id="odpoved" class="odpoved-input" placeholder="Tvá odpověď" autocomplete="off" />
+    </div>
+
+    <div class="odpoved-oblast">
+      <label>Vaše odpověď:</label>
+      <input type="text" id="odpoved" autocomplete="off" />
     </div>
 
     <button id="tlacitko">START</button>
@@ -277,7 +305,7 @@
       if (operace === '+') vysledek = cislo1 + cislo2;
       else if (operace === '-') vysledek = cislo1 - cislo2;
       else if (operace === '*') vysledek = BigInt(cislo1) * BigInt(cislo2);
-      else if (operace === '/') vysledek = cislo1 / cislo2; // skutečné číslo pro porovnání
+      else if (operace === '/') vysledek = cislo1 / cislo2; // uložíme jako number
 
       return { cislo1, cislo2, operace, vysledek };
     }
@@ -286,8 +314,8 @@
       const fVysledek = typeof priklad.vysledek === 'bigint'
         ? formatujCislo(priklad.vysledek)
         : (typeof priklad.vysledek === 'number'
-            ? formatujCislo(Math.round(priklad.vysledek * 10000) / 10000)
-            : priklad.vysledek.toString());
+            ? priklad.vysledek.toFixed(6).replace(/\.?0+$/, '') // odstraní koncové nuly
+            : formatujCislo(priklad.vysledek));
 
       return Math.max(
         formatujCislo(priklad.cislo1).length,
@@ -314,49 +342,14 @@
       const vysledekEl = document.getElementById('vysledek');
       vysledekEl.textContent = ' '.repeat(maxDelka);
       vysledekEl.style.visibility = 'hidden';
-
-      // Vyčistit vstup a styl
-      const input = document.getElementById('odpoved');
-      input.value = '';
-      input.style.backgroundColor = '';
-      input.style.borderColor = '#ccc';
-    }
-
-    function normalizujOdpoved(odpoved, jeDeleni) {
-      if (!jeDeleni) {
-        // U +, -, * očekáváme celé číslo – odstraníme mezery a nečíselné znaky
-        let ciste = odpoved.replace(/[^\d\-]/g, '');
-        return ciste === '' ? NaN : BigInt(ciste || 0);
-      } else {
-        // U dělení: nahradíme čárku tečkou a parsovat jako float
-        let normalized = odpoved.trim()
-          .replace(/,/g, '.')          // čárka → tečka
-          .replace(/[^\d.\-]/g, '');   // jen číslice, tečka, mínus
-        return normalized === '' ? NaN : parseFloat(normalized);
-      }
-    }
-
-    function porovnejOdpoved(zadano, skutecnyVysledek, jeDeleni) {
-      if (jeDeleni) {
-        const numZadano = zadano;
-        const tolerance = 0.0001;
-        return Math.abs(numZadano - skutecnyVysledek) < tolerance;
-      } else {
-        // Porovnání BigIntů
-        try {
-          return zadano === skutecnyVysledek;
-        } catch {
-          return false;
-        }
-      }
     }
 
     function zobrazVysledek(priklad) {
       const fVysledek = typeof priklad.vysledek === 'bigint'
         ? formatujCislo(priklad.vysledek)
         : (typeof priklad.vysledek === 'number'
-            ? formatujCislo(Math.round(priklad.vysledek * 10000) / 10000)
-            : priklad.vysledek.toString());
+            ? priklad.vysledek.toFixed(6).replace(/\.?0+$/, '')
+            : formatujCislo(priklad.vysledek));
 
       const maxDelka = spocitejMaxDelku(priklad);
 
@@ -369,14 +362,41 @@
       vysledekEl.style.visibility = 'visible';
     }
 
+    function normalizujDesetinnaCisla(vstup) {
+      // Povolíme čárku i tečku – nahradíme čárku tečkou pro parseFloat
+      return vstup.trim().replace(',', '.');
+    }
+
+    function porovnejOdpoved(uzivatelskaOdpoved, spravnyVysledek, operace) {
+      if (uzivatelskaOdpoved === '') return null;
+
+      const normalizovana = normalizujDesetinnaCisla(uzivatelskaOdpoved);
+      const cislo = parseFloat(normalizovana);
+
+      if (isNaN(cislo)) return false;
+
+      if (typeof spravnyVysledek === 'bigint') {
+        return BigInt(cislo) === spravnyVysledek;
+      }
+
+      if (typeof spravnyVysledek === 'number') {
+        // Pro dělení povolíme malou toleranci
+        return Math.abs(cislo - spravnyVysledek) < 1e-9;
+      }
+
+      return false;
+    }
+
     let zobrazitVysledek = false;
 
     document.getElementById('tlacitko').addEventListener('click', () => {
       const tlacitko = document.getElementById('tlacitko');
-      const input = document.getElementById('odpoved');
+      const odpovedEl = document.getElementById('odpoved');
+
+      // Reset barvy při každém kliku
+      odpovedEl.classList.remove('zelene', 'cervene');
 
       if (!zobrazitVysledek) {
-        // Fáze: generování příkladu
         const priklad = vygenerujPriklad();
         if (!priklad) {
           tlacitko.textContent = 'START';
@@ -385,41 +405,36 @@
         }
         aktualniPriklad = priklad;
         zobrazPriklad(priklad);
+        odpovedEl.value = ''; // vymažeme předchozí odpověď
         tlacitko.textContent = 'VÝSLEDEK';
         zobrazitVysledek = true;
-        input.focus();
       } else {
-        // Fáze: kontrola odpovědi
-        const odpoved = input.value.trim();
-        const jeDeleni = aktualniPriklad.operace === '/';
+        // Uživatel stiskl "VÝSLEDEK"
+        const uzivOdpoved = odpovedEl.value.trim();
 
-        if (odpoved === '') {
-          input.style.backgroundColor = '#fff3cd';
-          input.style.borderColor = '#ffc107';
-          return;
-        }
-
-        const normalizovana = normalizujOdpoved(odpoved, jeDeleni);
-        const jeSpravne = porovnejOdpoved(normalizovana, aktualniPriklad.vysledek, jeDeleni);
-
-        if (jeSpravne) {
-          input.style.backgroundColor = '#d4edda';
-          input.style.borderColor = '#28a745';
+        if (uzivOdpoved === '') {
+          // Prázdné → prostě zobraz výsledek
+          zobrazVysledek(aktualniPriklad);
         } else {
-          input.style.backgroundColor = '#f8d7da';
-          input.style.borderColor = '#dc3545';
+          // Něco je vyplněné → vyhodnoť
+          const jeSpravne = porovnejOdpoved(uzivOdpoved, aktualniPriklad.vysledek, aktualniPriklad.operace);
+          if (jeSpravne === true) {
+            odpovedEl.classList.add('zelene');
+          } else if (jeSpravne === false) {
+            odpovedEl.classList.add('cervene');
+          }
+          // Zobrazíme výsledek vždy
+          zobrazVysledek(aktualniPriklad);
         }
 
-        // Zobrazit skutečný výsledek
-        zobrazVysledek(aktualniPriklad);
         tlacitko.textContent = 'START';
         zobrazitVysledek = false;
       }
     });
 
-    // Také povolit Enter v inputu
+    // Enter v poli odpověď spustí "VÝSLEDEK"
     document.getElementById('odpoved').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && zobrazitVysledek) {
         document.getElementById('tlacitko').click();
       }
     });
