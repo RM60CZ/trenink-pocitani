@@ -342,7 +342,6 @@
       odpovedEl.classList.remove('zelene', 'cervene');
 
       if (!zobrazitVysledek) {
-        // START
         const p = vygenerujPriklad();
         if (!p) {
           tlacitkoEl.textContent = 'START';
@@ -352,12 +351,10 @@
         aktualniPriklad = p;
         zobrazPriklad(p);
         odpovedEl.value = '';
-        odpovedEl.placeholder = '';
         tlacitkoEl.textContent = 'VÝSLEDEK';
         zobrazitVysledek = true;
         setTimeout(() => odpovedEl.focus(), 10);
       } else {
-        // VÝSLEDEK
         const uziv = odpovedEl.value;
         const norm = normalizuj(uziv);
 
@@ -383,6 +380,7 @@
     // === Události ===
     tlacitkoEl.addEventListener('click', handleTlacitko);
 
+    // Enter na tlačítku (když má fokus)
     tlacitkoEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -390,6 +388,7 @@
       }
     });
 
+    // Enter ve vstupním poli
     odpovedEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
