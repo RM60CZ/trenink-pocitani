@@ -31,7 +31,7 @@
     }
 
     h1 {
-      color: #2c3e50;
+      color: #27ae60;
       margin-top: 0;
       font-size: 1.8rem;
     }
@@ -41,6 +41,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: flex-end;
       gap: 15px;
     }
 
@@ -90,14 +91,42 @@
       background-color: #2980b9;
     }
 
+    .priklad-oblast {
+      margin: 25px 0;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+
     .example {
       font-family: monospace;
       font-size: 1.6rem;
       line-height: 1.6;
-      margin: 25px 0;
       text-align: right;
       white-space: pre;
       direction: ltr;
+    }
+
+    .cara {
+      font-family: monospace;
+      font-size: 1.6rem;
+      text-align: right;
+      white-space: pre;
+      color: #2c3e50;
+      line-height: 1.2;
+      visibility: hidden;
+    }
+
+    .result-line {
+      font-family: monospace;
+      font-size: 1.6rem;
+      text-align: right;
+      color: #27ae60;
+      font-weight: bold;
+      white-space: pre;
+      visibility: hidden;
     }
 
     .error {
@@ -107,21 +136,12 @@
       min-height: 24px;
     }
 
-    .result-line {
-      margin-top: 12px;
-      font-family: monospace;
-      font-size: 1.6rem;
-      text-align: right;
-      color: #27ae60;
-      font-weight: bold;
-    }
-
     @media (max-width: 600px) {
       .controls {
         flex-direction: column;
         align-items: center;
       }
-      .example, .result-line {
+      .example, .result-line, .cara {
         font-size: 1.3rem;
       }
     }
@@ -145,24 +165,23 @@
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">1. čísla:</span>
-        <select id="cislice1">
-          <!-- Naplní se skriptem -->
-        </select>
+        <select id="cislice1"></select>
       </div>
 
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">2. čísla:</span>
-        <select id="cislice2">
-          <!-- Naplní se skriptem -->
-        </select>
+        <select id="cislice2"></select>
       </div>
     </div>
 
     <div class="error" id="chyba"></div>
 
-    <div class="example" id="priklad">Zatím žádný příklad</div>
-    <div class="result-line" id="vysledek"></div>
+    <div class="priklad-oblast">
+      <div class="example" id="priklad">Zatím žádný příklad</div>
+      <div class="cara" id="cara">──────────</div>
+      <div class="result-line" id="vysledek"></div>
+    </div>
 
     <button id="tlacitko">START</button>
   </div>
@@ -238,10 +257,11 @@
         return null;
       }
 
+      // Použití BigInt pro přesné násobení
       let vysledek;
       if (operace === '+') vysledek = cislo1 + cislo2;
       else if (operace === '-') vysledek = cislo1 - cislo2;
-      else if (operace === '*') vysledek = cislo1 * cislo2;
+      else if (operace === '*') vysledek = BigInt(cislo1) * BigInt(cislo2);
       else if (operace === '/') vysledek = (cislo1 / cislo2).toFixed(4);
 
       return { cislo1, cislo2, operace, vysledek };
@@ -257,13 +277,17 @@
       const radek2 = operace + ' ' + f2.padStart(maxDelka - 2);
 
       document.getElementById('priklad').textContent = radek1 + '\n' + radek2;
+      document.getElementById('cara').style.visibility = 'hidden';
+      document.getElementById('vysledek').style.visibility = 'hidden';
       document.getElementById('vysledek').textContent = '';
     }
 
     function zobrazVysledek(priklad) {
-      const fVysledek = typeof priklad.vysledek === 'string'
-        ? priklad.vysledek
-        : formatujCislo(priklad.vysledek);
+      const fVysledek = typeof priklad.vysledek === 'bigint'
+        ? formatujCislo(priklad.vysledek)
+        : (typeof priklad.vysledek === 'string'
+          ? priklad.vysledek
+          : formatujCislo(priklad.vysledek));
 
       const maxDelka = Math.max(
         formatujCislo(priklad.cislo1).length,
@@ -271,7 +295,15 @@
         fVysledek.length
       );
 
-      document.getElementById('vysledek').textContent = fVysledek.padStart(maxDelka);
+      const caraEl = document.getElementById('cara');
+      const vysledekEl = document.getElementById('vysledek');
+
+      // Čára ze znaků ─ ve stejné šířce jako čísla
+      caraEl.textContent = '─'.repeat(maxDelka);
+      caraEl.style.visibility = 'visible';
+
+      vysledekEl.textContent = fVysledek.padStart(maxDelka);
+      vysledekEl.style.visibility = 'visible';
     }
 
     let zobrazitVysledek = false;
