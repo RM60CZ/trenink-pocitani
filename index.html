@@ -1,345 +1,262 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Trénink počítání</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Trénink počítání</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+        h1 { color: #3498db; margin-bottom: 15px; }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
-    }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 4px;
+        }
+        select {
+            padding: 6px 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
 
-    .container {
-      background: white;
-      padding: 15px;
-      border-radius: 16px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-    }
+        .priklad-oblast {
+            margin: 20px 0;
+            min-height: 120px;
+        }
+        .example, .cara, .result-line {
+            font-family: 'Courier New', monospace;
+            font-size: 2rem;
+            line-height: 1.1;
+            white-space: pre;
+            text-align: right;
+        }
+        .cara { color: #2c3e50; }
+        .result-line { 
+            font-weight: bold; 
+            min-height: 2.2rem;
+        }
 
-    h1 {
-      color: #3498db;
-      margin: 0 0 10px;
-      font-size: 1.5rem;
-    }
+        #odpoved {
+            width: 160px;
+            font-size: 1.6rem;
+            padding: 12px;
+            text-align: center;
+            border: 3px solid #3498db;
+            border-radius: 12px;
+            outline: none;
+            margin: 10px 0;
+        }
+        #odpoved.zelene { border-color: #28a745; background: #d4edda; }
+        #odpoved.cervene { border-color: #dc3545; background: #f8d7da; }
 
-    .controls {
-      margin: 0 0 8px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 8px;
-    }
+        button {
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:active { background: #2980b9; }
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    label {
-      font-weight: bold;
-      margin-bottom: 2px;
-      color: #34495e;
-      font-size: 0.8rem;
-    }
-
-    .label-top {
-      font-weight: bold;
-      color: #34495e;
-      font-size: 0.75rem;
-      line-height: 1.1;
-    }
-
-    .label-bottom {
-      font-weight: bold;
-      color: #34495e;
-      font-size: 0.75rem;
-      margin-bottom: 2px;
-    }
-
-    select {
-      padding: 5px 3px;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: white;
-      width: 50px;
-    }
-
-    #operace {
-      width: 55px;
-    }
-
-    button {
-      padding: 12px 20px;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 10px;
-      background-color: #3498db;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      min-width: 130px;
-      margin-top: 8px;
-    }
-
-    button:active {
-      background-color: #2980b9;
-    }
-
-    .priklad-oblast {
-      margin: 8px auto 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .example,
-    .cara,
-    .result-line {
-      font-family: 'Courier New', monospace;
-      font-size: 1.8rem;
-      line-height: 1.2;
-      white-space: pre;
-      text-align: right;
-    }
-
-    .cara {
-      color: #2c3e50;
-    }
-
-    .result-line {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
-    .odpoved-oblast {
-      margin: 6px 0 0;
-    }
-
-    #odpoved {
-      padding: 10px;
-      font-size: 1.3rem;
-      text-align: center;
-      border: 2px solid #3498db;
-      border-radius: 8px;
-      width: 150px;
-      outline: none;
-    }
-
-    #odpoved.zelene {
-      background-color: #d4edda;
-      border-color: #28a745;
-    }
-
-    #odpoved.cervene {
-      background-color: #f8d7da;
-      border-color: #dc3545;
-    }
-
-    .error {
-      color: #e74c3c;
-      font-weight: bold;
-      margin: 4px 0;
-      font-size: 0.85rem;
-      min-height: 20px;
-    }
-  </style>
+        .error { color: #e74c3c; min-height: 24px; margin: 8px 0; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Trénink počítání</h1>
+    <div class="container">
+        <h1>Trénink počítání</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Operace</label>
+                <select id="operace">
+                    <option value="+">+</option>
+                    <option value="-">−</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>1. číslo (číslic)</label>
+                <select id="cislice1"></select>
+            </div>
+            <div class="control-group">
+                <label>2. číslo (číslic)</label>
+                <select id="cislice2"></select>
+            </div>
+        </div>
 
-    <div class="controls">
-      <div class="control-group">
-        <label for="operace">Operace</label>
-        <select id="operace">
-          <option value="+">+</option>
-          <option value="-">−</option>
-          <option value="*">×</option>
-          <option value="/">÷</option>
-        </select>
-      </div>
+        <div class="error" id="chyba"></div>
 
-      <div class="control-group">
-        <span class="label-top">1. číslo</span>
-        <span class="label-bottom">číslic:</span>
-        <select id="cislice1"></select>
-      </div>
+        <div class="priklad-oblast">
+            <div class="example" id="priklad"></div>
+            <div class="cara" id="cara"></div>
+            <div class="result-line" id="vysledek"></div>
+        </div>
 
-      <div class="control-group">
-        <span class="label-top">2. číslo</span>
-        <span class="label-bottom">číslic:</span>
-        <select id="cislice2"></select>
-      </div>
+        <input type="text" id="odpoved" inputmode="numeric" autocomplete="off">
+
+        <button id="tlacitko">START</button>
     </div>
 
-    <div class="error" id="chyba"></div>
+    <script>
+        const operaceEl = document.getElementById('operace');
+        const cislice1El = document.getElementById('cislice1');
+        const cislice2El = document.getElementById('cislice2');
+        const chybaEl = document.getElementById('chyba');
+        const prikladEl = document.getElementById('priklad');
+        const caraEl = document.getElementById('cara');
+        const vysledekEl = document.getElementById('vysledek');
+        const odpovedEl = document.getElementById('odpoved');
+        const tlacitkoEl = document.getElementById('tlacitko');
 
-    <div class="priklad-oblast">
-      <div class="example" id="priklad"></div>
-      <div class="cara" id="cara"></div>
-      <div class="result-line" id="vysledek"></div>
-    </div>
-
-    <div class="odpoved-oblast">
-      <input type="text" id="odpoved" inputmode="numeric" />
-    </div>
-
-    <button id="tlacitko">START</button>
-  </div>
-
-  <script>
-    const operaceEl = document.getElementById('operace');
-    const cislice1El = document.getElementById('cislice1');
-    const cislice2El = document.getElementById('cislice2');
-    const chybaEl = document.getElementById('chyba');
-    const prikladEl = document.getElementById('priklad');
-    const caraEl = document.getElementById('cara');
-    const vysledekEl = document.getElementById('vysledek');
-    const odpovedEl = document.getElementById('odpoved');
-    const tlacitkoEl = document.getElementById('tlacitko');
-
-    for (let i = 1; i <= 9; i++) {
-      cislice1El.innerHTML += `<option value="${i}">${i}</option>`;
-      cislice2El.innerHTML += `<option value="${i}">${i}</option>`;
-    }
-    cislice1El.value = '2';
-    cislice2El.value = '1';
-
-    function format(cislo) {
-      if (typeof cislo === 'bigint') return cislo.toString();
-      return cislo.toString();
-    }
-
-    function nahodne(n) {
-      const min = Math.pow(10, n - 1);
-      const max = Math.pow(10, n) - 1;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    let priklad = null;
-    let faze = 'start'; // start | cekam | hotovo
-
-    function generuj() {
-      const op = operaceEl.value;
-      const n1 = parseInt(cislice1El.value);
-      const n2 = parseInt(cislice2El.value);
-
-      chybaEl.textContent = '';
-
-      if (op === '-' && n1 < n2) {
-        chybaEl.textContent = '1. číslo musí být větší';
-        return null;
-      }
-
-      let a = nahodne(n1);
-      let b;
-      if (op === '/') {
-        b = nahodne(n2);
-        if (b === 0) b = nahodne(n2);
-      } else {
-        b = nahodne(n2);
-      }
-
-      if (op === '-' && a <= b) {
-        [a, b] = [b, a];
-      }
-
-      let v;
-      if (op === '+') v = a + b;
-      else if (op === '-') v = a - b;
-      else if (op === '*') v = BigInt(a) * BigInt(b);
-      else if (op === '/') v = a / b;
-
-      return { a, b, op, v };
-    }
-
-    function ukazPriklad(p) {
-      const fa = format(p.a);
-      const fb = format(p.b);
-      const fv = format(p.v);
-      const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
-
-      prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-      caraEl.textContent = '─'.repeat(max);
-      caraEl.style.display = 'block';
-      vysledekEl.textContent = fv.padStart(max);
-      vysledekEl.style.display = 'none';
-    }
-
-    function ukazVysledek(p) {
-      vysledekEl.style.display = 'block';
-    }
-
-    function novyPriklad() {
-      priklad = generuj();
-      if (!priklad) return;
-      ukazPriklad(priklad);
-      odpovedEl.value = '';
-      odpovedEl.className = '';
-      faze = 'cekam';
-    }
-
-    function zkontroluj() {
-      const vstup = odpovedEl.value.trim().replace(',', '.');
-      if (vstup === '') return;
-
-      const spravne = vstup === priklad.v.toString();
-      odpovedEl.className = spravne ? 'zelene' : 'cervene';
-      ukazVysledek(priklad);
-      faze = 'hotovo';
-    }
-
-    tlacitkoEl.addEventListener('click', () => {
-      if (faze === 'start' || faze === 'hotovo') {
-        novyPriklad();
-        if (priklad) {
-          tlacitkoEl.textContent = 'VÝSLEDEK';
-          setTimeout(() => {
-            odpovedEl.focus();
-          }, 100);
+        // Naplnění selectů
+        for (let i = 1; i <= 9; i++) {
+            cislice1El.innerHTML += `<option value="${i}">${i}</option>`;
+            cislice2El.innerHTML += `<option value="${i}">${i}</option>`;
         }
-      } else if (faze === 'cekam') {
-        zkontroluj();
-        tlacitkoEl.textContent = 'START';
-      }
-    });
+        cislice1El.value = '2';
+        cislice2El.value = '1';
 
-    odpovedEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        tlacitkoEl.click();
-      }
-    });
+        let aktualniPriklad = null;
+        let jeHotovo = false;
 
-    tlacitkoEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        tlacitkoEl.click();
-      }
-    });
+        function nahodne(n) {
+            const min = Math.pow(10, n - 1);
+            const max = Math.pow(10, n) - 1;
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-    // Inicializace
-    prikladEl.textContent = '';
-    caraEl.textContent = '';
-    vysledekEl.textContent = '';
-  </script>
+        function generujPriklad() {
+            const op = operaceEl.value;
+            const n1 = parseInt(cislice1El.value);
+            const n2 = parseInt(cislice2El.value);
+            chybaEl.textContent = '';
+
+            let a = nahodne(n1);
+            let b = nahodne(n2);
+
+            if (op === '-') {
+                if (a < b) [a, b] = [b, a];
+            }
+            if (op === '/' && b === 0) b = nahodne(n2) || 1;
+
+            let v;
+            if (op === '+') v = a + b;
+            else if (op === '-') v = a - b;
+            else if (op === '*') v = a * b;
+            else if (op === '/') v = a / b;
+
+            return { a, b, op, v };
+        }
+
+        function zobrazPriklad(p) {
+            const fa = p.a.toString();
+            const fb = p.b.toString();
+            const opZnak = p.op === '*' ? '×' : p.op === '/' ? '÷' : p.op;
+
+            const maxLen = Math.max(fa.length, (opZnak + ' ' + fb).length);
+
+            prikladEl.textContent = fa.padStart(maxLen) + '\n' + (opZnak + ' ' + fb).padStart(maxLen);
+            caraEl.textContent = '─'.repeat(maxLen);
+            vysledekEl.textContent = '';
+            vysledekEl.style.display = 'none';
+        }
+
+        function novyPriklad() {
+            aktualniPriklad = generujPriklad();
+            zobrazPriklad(aktualniPriklad);
+            odpovedEl.value = '';
+            odpovedEl.className = '';
+            jeHotovo = false;
+            setTimeout(() => odpovedEl.focus(), 50);
+        }
+
+        function zkontrolujOdpoved() {
+            if (!aktualniPriklad || jeHotovo) return;
+
+            const vstup = odpovedEl.value.trim().replace(',', '.');
+            if (vstup === '') return;
+
+            const spravne = parseFloat(vstup) === parseFloat(aktualniPriklad.v);
+
+            odpovedEl.className = spravne ? 'zelene' : 'cervene';
+            vysledekEl.textContent = aktualniPriklad.v;
+            vysledekEl.style.display = 'block';
+            jeHotovo = true;
+
+            // Po 800ms nový příklad
+            setTimeout(() => {
+                if (jeHotovo) novyPriklad();
+            }, 800);
+        }
+
+        // === Ovládání ===
+        tlacitkoEl.addEventListener('click', () => {
+            if (!jeHotovo) {
+                zkontrolujOdpoved();
+            } else {
+                novyPriklad();
+            }
+        });
+
+        odpovedEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!jeHotovo) {
+                    zkontrolujOdpoved();
+                } else {
+                    novyPriklad();
+                }
+            }
+        });
+
+        // START prvního příkladu
+        tlacitkoEl.addEventListener('click', () => {
+            if (!aktualniPriklad) {
+                tlacitkoEl.textContent = "DALŠÍ";
+                novyPriklad();
+            }
+        }, { once: true });
+
+        // Inicializace
+        prikladEl.textContent = 'Připraveno';
+        caraEl.textContent = '';
+    </script>
 </body>
 </html>
