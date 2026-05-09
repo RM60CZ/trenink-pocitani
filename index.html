@@ -5,33 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trénink počítání</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
-      margin: 0; padding: 20px;
-      display: flex; justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
     }
+
     .container {
-      background: white; padding: 25px; border-radius: 16px;
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      width: 95%; max-width: 500px; text-align: center;
+      width: 95%;
+      max-width: 500px;
+      text-align: center;
     }
-    h1 { color: #3498db; margin-top: 0; }
-    .controls { margin: 20px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; align-items: flex-end; }
-    .control-group { display: flex; flex-direction: column; align-items: center; }
-    label, .label-top, .label-bottom { font-weight: bold; color: #34495e; font-size: 0.9rem; }
-    .label-top { line-height: 1.3; }
-    .label-bottom { margin-bottom: 6px; }
-    select { padding: 8px 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px; width: 60px; }
-    #operace { width: 70px; }
+
+    h1 {
+      color: #3498db;
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    .controls {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+
+    .label-top {
+      font-weight: bold;
+      color: #34495e;
+      line-height: 1.3;
+      font-size: 0.9rem;
+    }
+
+    .label-bottom {
+      font-weight: bold;
+      color: #34495e;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    select {
+      padding: 8px 6px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      width: 60px;
+    }
+
+    #operace {
+      width: 70px;
+    }
+
     button {
-      padding: 10px 14px; font-size: 1rem; border: none; border-radius: 8px;
-      background: #3498db; color: white; cursor: pointer; font-weight: bold;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
       min-width: 120px;
     }
-    button:hover { background: #2980b9; }
+
+    button:hover {
+      background-color: #2980b9;
+    }
 
     .priklad-oblast {
       margin: 0 auto 15px;
@@ -39,31 +107,82 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       width: fit-content;
     }
-    .example, .cara, .result-line {
-      font-family: monospace; font-size: 2rem; line-height: 1.4; white-space: pre; text-align: right;
+
+    .example,
+    .cara,
+    .result-line {
+      font-family: monospace;
+      font-size: 2.0rem;
+      line-height: 1.4;
+      white-space: pre;
+      text-align: right;
     }
-    .cara { color: #2c3e50; visibility: hidden; }
-    .result-line { color: #27ae60; font-weight: bold; visibility: hidden; }
+
+    .cara {
+      color: #2c3e50;
+      visibility: hidden;
+    }
+
+    .result-line {
+      color: #27ae60;
+      font-weight: bold;
+      visibility: hidden;
+    }
 
     .odpoved-oblast {
-      margin: 15px 0; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
-    .odpoved-oblast label { font-weight: normal; color: #555; }
+
+    .odpoved-oblast label {
+      font-weight: normal;
+      font-size: 1rem;
+      color: #555;
+    }
+
     #odpoved {
-      padding: 10px; font-size: 1.2rem; text-align: center; width: 180px;
-      border: 2px solid #ccc; border-radius: 8px;
+      padding: 10px;
+      font-size: 1.2rem;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      width: 180px;
       transition: border-color 0.3s, background-color 0.3s;
     }
-    #odpoved.zelene { background: #d4edda; border-color: #28a745; }
-    #odpoved.cervene { background: #f8d7da; border-color: #dc3545; }
 
-    .error { color: #e74c3c; font-weight: bold; margin: 15px 0; min-height: 24px; }
+    #odpoved.zelene {
+      background-color: #d4edda;
+      border-color: #28a745;
+    }
+
+    #odpoved.cervene {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 15px 0;
+      min-height: 24px;
+    }
 
     @media (max-width: 600px) {
-      .example, .cara, .result-line { font-size: 1.6rem; }
-      #odpoved { width: 150px; font-size: 1.1rem; }
+      .example,
+      .cara,
+      .result-line {
+        font-size: 1.6rem;
+      }
+      #odpoved {
+        width: 150px;
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
@@ -81,11 +200,13 @@
           <option value="/">÷</option>
         </select>
       </div>
+
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">1. čísla:</span>
         <select id="cislice1"></select>
       </div>
+
       <div class="control-group">
         <span class="label-top">Počet číslic</span>
         <span class="label-bottom">2. čísla:</span>
@@ -111,171 +232,212 @@
 
   <script>
     // ─── Pomocné funkce ───────────────────────────────────────
-    const formatCislo = (x) => {
-      if (typeof x === 'bigint') return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-      if (typeof x !== 'number') return String(x);
-      if (Number.isInteger(x)) return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-      const [cela, des] = x.toString().split('.');
-      return (cela.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + '.' + des).replace(/\.?0+$/, '');
-    };
-
-    const normalizujOdpoved = (s) => s.trim().replace(/\s+/g, '').replace(',', '.');
-
-    const generujCislo = (n) => {
-      const min = 10**(n-1), max = 10**n - 1;
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-
-    // ─── Hlavní třída ─────────────────────────────────────────
-    class Kalkulacka {
-      constructor() {
-        this.priklad = null;
-        this.stav = 'start'; // 'start' | 'cekani'
-        this.initDOM();
-        this.naplnSelecty();
-        this.bindEvents();
+    function formatujCislo(cislo) {
+      if (typeof cislo === 'bigint') {
+        return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       }
-
-      initDOM() {
-        this.el = {
-          operace: document.getElementById('operace'),
-          cislice1: document.getElementById('cislice1'),
-          cislice2: document.getElementById('cislice2'),
-          chyba: document.getElementById('chyba'),
-          priklad: document.getElementById('priklad'),
-          cara: document.getElementById('cara'),
-          vysledek: document.getElementById('vysledek'),
-          odpoved: document.getElementById('odpoved'),
-          tlacitko: document.getElementById('tlacitko')
-        };
-      }
-
-      naplnSelecty() {
-        for (let i = 1; i <= 9; i++) {
-          this.el.cislice1.innerHTML += `<option value="${i}">${i}</option>`;
-          this.el.cislice2.innerHTML += `<option value="${i}">${i}</option>`;
-        }
-        this.el.cislice1.value = '2';
-        this.el.cislice2.value = '1';
-        this.el.operace.value = '+';
-      }
-
-      bindEvents() {
-        this.el.tlacitko.addEventListener('click', () => this.handleTlacitko());
-        this.el.odpoved.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && this.stav === 'cekani') this.handleTlacitko();
-        });
-      }
-
-      handleTlacitko() {
-        if (this.stav === 'start') {
-          this.novyPriklad();
+      if (typeof cislo === 'number') {
+        if (Number.isInteger(cislo)) {
+          return cislo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         } else {
-          this.zkontrolujOdpoved();
+          const [cela, desetinna] = cislo.toString().split('.');
+          const celaFormatovana = cela.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+          return desetinna ? `${celaFormatovana}.${desetinna}` : celaFormatovana;
+        }
+      }
+      return cislo.toString();
+    }
+
+    function normalizujOdpoved(vstup) {
+      return vstup
+        .trim()
+        .replace(/\s+/g, '')   // odstraní všechny mezery
+        .replace(',', '.');    // čárka → tečka
+    }
+
+    function generujCislo(pocetCislic) {
+      const min = Math.pow(10, pocetCislic - 1);
+      const max = Math.pow(10, pocetCislic) - 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // ─── Hlavní logika ────────────────────────────────────────
+    let aktualniPriklad = null;
+    let zobrazitVysledek = false;
+
+    const el = {
+      operace: document.getElementById('operace'),
+      cislice1: document.getElementById('cislice1'),
+      cislice2: document.getElementById('cislice2'),
+      chyba: document.getElementById('chyba'),
+      priklad: document.getElementById('priklad'),
+      cara: document.getElementById('cara'),
+      vysledek: document.getElementById('vysledek'),
+      odpoved: document.getElementById('odpoved'),
+      tlacitko: document.getElementById('tlacitko')
+    };
+
+    // Naplnění selectů
+    function naplnCislice() {
+      for (let i = 1; i <= 9; i++) {
+        el.cislice1.innerHTML += `<option value="${i}">${i}</option>`;
+        el.cislice2.innerHTML += `<option value="${i}">${i}</option>`;
+      }
+      el.cislice1.value = '2';
+      el.cislice2.value = '1';
+    }
+
+    function vygenerujPriklad() {
+      const operace = el.operace.value;
+      const pocet1 = parseInt(el.cislice1.value);
+      const pocet2 = parseInt(el.cislice2.value);
+
+      el.chyba.textContent = '';
+
+      if (operace === '-' && pocet1 < pocet2) {
+        el.chyba.textContent = '❌ Nelze: 1. číslo má méně číslic → výsledek by byl záporný.';
+        return null;
+      }
+
+      let cislo1, cislo2;
+      let pokusy = 0;
+      const MAX_POKUSU = 1000;
+
+      while (pokusy < MAX_POKUSU) {
+        pokusy++;
+        cislo1 = generujCislo(pocet1);
+        if (pocet2 === 1) {
+          cislo2 = Math.floor(Math.random() * 8) + 2;
+        } else {
+          cislo2 = generujCislo(pocet2);
+        }
+        if (operace === '-' && cislo1 <= cislo2) continue;
+        if (operace === '/' && cislo2 === 0) continue;
+        break;
+      }
+
+      if (pokusy >= MAX_POKUSU) {
+        el.chyba.textContent = '❌ Nepodařilo se vygenerovat platný příklad. Zkuste jinou kombinaci.';
+        return null;
+      }
+
+      let vysledek;
+      if (operace === '+') vysledek = cislo1 + cislo2;
+      else if (operace === '-') vysledek = cislo1 - cislo2;
+      else if (operace === '*') vysledek = BigInt(cislo1) * BigInt(cislo2);
+      else if (operace === '/') vysledek = cislo1 / cislo2;
+
+      return { cislo1, cislo2, operace, vysledek };
+    }
+
+    function spocitejMaxDelku(priklad) {
+      const fVysledek = formatujCislo(priklad.vysledek);
+      return Math.max(
+        formatujCislo(priklad.cislo1).length,
+        (priklad.operace + ' ' + formatujCislo(priklad.cislo2)).length,
+        fVysledek.length
+      );
+    }
+
+    function zobrazPriklad(priklad) {
+      const { cislo1, cislo2, operace } = priklad;
+      const f1 = formatujCislo(cislo1);
+      const f2 = formatujCislo(cislo2);
+      const maxDelka = spocitejMaxDelku(priklad);
+      const radek1 = f1.padStart(maxDelka);
+      const radek2 = operace + ' ' + f2.padStart(maxDelka - 2);
+      el.priklad.textContent = radek1 + '\n' + radek2;
+
+      el.cara.textContent = '─'.repeat(maxDelka);
+      el.cara.style.visibility = 'hidden';
+      el.vysledek.textContent = ' '.repeat(maxDelka);
+      el.vysledek.style.visibility = 'hidden';
+    }
+
+    function zobrazVysledek(priklad) {
+      const fVysledek = formatujCislo(priklad.vysledek);
+      const maxDelka = spocitejMaxDelku(priklad);
+      el.cara.style.visibility = 'visible';
+      el.vysledek.textContent = fVysledek.padStart(maxDelka);
+      el.vysledek.style.visibility = 'visible';
+    }
+
+    function porovnejOdpoved(uzivatelskaOdpoved, spravnyVysledek) {
+      if (uzivatelskaOdpoved.trim() === '') return null;
+      const normalizovana = normalizujOdpoved(uzivatelskaOdpoved);
+      if (normalizovana === '') return false;
+
+      if (typeof spravnyVysledek === 'bigint') {
+        try {
+          return BigInt(normalizovana) === spravnyVysledek;
+        } catch {
+          return false;
         }
       }
 
-      novyPriklad() {
-        const op = this.el.operace.value;
-        const n1 = +this.el.cislice1.value;
-        const n2 = +this.el.cislice2.value;
+      if (typeof spravnyVysledek === 'number') {
+        const uzivCislo = parseFloat(normalizovana);
+        return !isNaN(uzivCislo) && Math.abs(uzivCislo - spravnyVysledek) < 1e-9;
+      }
+      return false;
+    }
 
-        this.el.chyba.textContent = '';
+    // ─── Obsluha událostí ─────────────────────────────────────
+    function handleTlacitko() {
+      el.odpoved.classList.remove('zelene', 'cervene');
 
-        // Validace
-        if (op === '-' && n1 < n2) {
-          this.el.chyba.textContent = '❌ Nelze: 1. číslo má méně číslic → výsledek by byl záporný.';
+      if (!zobrazitVysledek) {
+        const priklad = vygenerujPriklad();
+        if (!priklad) {
+          el.tlacitko.textContent = 'START';
+          zobrazitVysledek = false;
           return;
         }
-
-        // Generování
-        let a, b, pokusy = 0;
-        do {
-          a = generujCislo(n1);
-          b = n2 === 1 ? Math.floor(Math.random() * 8) + 2 : generujCislo(n2);
-          if (++pokusy > 1000) {
-            this.el.chyba.textContent = '❌ Nepodařilo se vygenerovat platný příklad.';
-            return;
-          }
-        } while ((op === '-' && a <= b) || (op === '/' && b === 0));
-
-        // Výpočet
-        let vysledek;
-        if (op === '+') vysledek = a + b;
-        else if (op === '-') vysledek = a - b;
-        else if (op === '*') vysledek = BigInt(a) * BigInt(b);
-        else if (op === '/') vysledek = a / b;
-
-        this.priklad = { a, b, op, vysledek };
-        this.zobrazPriklad();
-        this.resetOdpoved();
-        this.stav = 'cekani';
-        this.el.tlacitko.textContent = 'VÝSLEDEK';
-        setTimeout(() => this.el.odpoved.focus(), 10);
-      }
-
-      zobrazPriklad() {
-        const { a, b, op } = this.priklad;
-        const fa = formatCislo(a), fb = formatCislo(b);
-        const max = Math.max(fa.length, (op + ' ' + fb).length, formatCislo(this.priklad.vysledek).length);
-        this.el.priklad.textContent = `${fa.padStart(max)}\n${(op + ' ' + fb).padStart(max)}`;
-        this.el.cara.textContent = '─'.repeat(max);
-        this.el.cara.style.visibility = 'hidden';
-        this.el.vysledek.textContent = ' '.repeat(max);
-        this.el.vysledek.style.visibility = 'hidden';
-      }
-
-      resetOdpoved() {
-        this.el.odpoved.value = '';
-        this.el.odpoved.classList.remove('zelene', 'cervene');
-      }
-
-      zkontrolujOdpoved() {
-        const uziv = this.el.odpoved.value;
-        const normalizovana = normalizujOdpoved(uziv);
-
-        if (normalizovana === '') {
-          // Prázdné → ukáž výsledek bez barvy
-          this.zobrazVysledek();
+        aktualniPriklad = priklad;
+        zobrazPriklad(priklad);
+        el.odpoved.value = '';
+        el.tlacitko.textContent = 'VÝSLEDEK';
+        zobrazitVysledek = true;
+        setTimeout(() => el.odpoved.focus(), 10);
+      } else {
+        const uzivOdpoved = el.odpoved.value;
+        if (uzivOdpoved.trim() === '') {
+          zobrazVysledek(aktualniPriklad);
         } else {
-          const spravne = this.jeSpravne(normalizovana);
-          if (spravne) {
-            this.el.odpoved.classList.add('zelene');
-          } else {
-            this.el.odpoved.classList.add('cervene');
+          const jeSpravne = porovnejOdpoved(uzivOdpoved, aktualniPriklad.vysledek);
+          if (jeSpravne === true) {
+            el.odpoved.classList.add('zelene');
+          } else if (jeSpravne === false) {
+            el.odpoved.classList.add('cervene');
           }
-          this.zobrazVysledek();
+          zobrazVysledek(aktualniPriklad);
         }
-
-        this.stav = 'start';
-        this.el.tlacitko.textContent = 'START';
-      }
-
-      jeSpravne(normalizovana) {
-        const { vysledek } = this.priklad;
-        if (typeof vysledek === 'bigint') {
-          try { return BigInt(normalizovana) === vysledek; }
-          catch { return false; }
-        }
-        const num = parseFloat(normalizovana);
-        return !isNaN(num) && Math.abs(num - vysledek) < 1e-9;
-      }
-
-      zobrazVysledek() {
-        const txt = formatCislo(this.priklad.vysledek);
-        const max = Math.max(
-          formatCislo(this.priklad.a).length,
-          (this.priklad.op + ' ' + formatCislo(this.priklad.b)).length,
-          txt.length
-        );
-        this.el.cara.style.visibility = 'visible';
-        this.el.vysledek.textContent = txt.padStart(max);
-        this.el.vysledek.style.visibility = 'visible';
+        el.tlacitko.textContent = 'START';
+        zobrazitVysledek = false;
       }
     }
 
-    // Spuštění
-    new Kalkulacka();
+    // Události
+    el.tlacitko.addEventListener('click', handleTlacitko);
+
+    // Enter na tlačítku START
+    el.tlacitko.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleTlacitko();
+      }
+    });
+
+    // Enter ve vstupním poli = VÝSLEDEK
+    el.odpoved.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && zobrazitVysledek) {
+        handleTlacitko();
+      }
+    });
+
+    // Inicializace
+    naplnCislice();
+    el.operace.value = '+';
   </script>
 </body>
 </html>
