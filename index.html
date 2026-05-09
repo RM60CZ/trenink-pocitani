@@ -250,7 +250,6 @@
 
     // === Globální proměnné ===
     let aktualniPriklad = null;
-    let zobrazitVysledek = false;
 
     // === DOM elementy ===
     const operaceEl  = document.getElementById('operace');
@@ -337,84 +336,59 @@
       vysledekEl.style.visibility = 'visible';
     }
 
-    // === Obsluha tlačítka ===
-    function handleTlacitko() {
-      // Zabraň ztrátě focusu na mobilu
-      tlacitkoEl.blur();
+    // === Kontrola odpovědi ===
+    function zkontrolujOdpoved() {
+      const uziv = odpovedEl.value;
+      const norm = normalizuj(uziv);
+      if (norm === '') return;
 
-      odpovedEl.classList.remove('zelene', 'cervene');
-
-      if (!zobrazitVysledek) {
-        // START
-        const p = vygenerujPriklad();
-        if (!p) {
-          tlacitkoEl.textContent = 'START';
-          zobrazitVysledek = false;
-          return;
-        }
-        aktualniPriklad = p;
-        zobrazPriklad(p);
-        odpovedEl.value = '';
-        tlacitkoEl.textContent = 'VÝSLEDEK';
-        zobrazitVysledek = true;
-        // Okamžitě focus a otevření klávesnice
-        odpovedEl.focus();
-        odpovedEl.click();
-      } else {
-        // VÝSLEDEK
-        const uziv = odpovedEl.value;
-        const norm = normalizuj(uziv);
-
-        if (norm !== '') {
-          let spravne = false;
-          const v = aktualniPriklad.vysledek;
-          if (typeof v === 'bigint') {
-            try { spravne = BigInt(norm) === v; } catch { spravne = false; }
-          } else if (typeof v === 'number') {
-            const num = parseFloat(norm);
-            spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
-          }
-          odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-        }
-        zobrazVysledek(aktualniPriklad);
-        tlacitkoEl.textContent = 'START';
-        zobrazitVysledek = false;
-
-        // Po zobrazení výsledku zůstat ve vstupním poli a hned vygenerovat další příklad
-        setTimeout(() => {
-          const novyPriklad = vygenerujPriklad();
-          if (novyPriklad) {
-            aktualniPriklad = novyPriklad;
-            zobrazPriklad(novyPriklad);
-            odpovedEl.value = '';
-            odpovedEl.classList.remove('zelene', 'cervene');
-            caraEl.style.visibility = 'hidden';
-            vysledekEl.style.visibility = 'hidden';
-            tlacitkoEl.textContent = 'VÝSLEDEK';
-            zobrazitVysledek = true;
-          }
-          // Udržet focus v poli pro okamžité zadávání
-          odpovedEl.focus();
-        }, 600);
+      let spravne = false;
+      const v = aktualniPriklad.vysledek;
+      if (typeof v === 'bigint') {
+        try { spravne = BigInt(norm) === v; } catch { spravne = false; }
+      } else if (typeof v === 'number') {
+        const num = parseFloat(norm);
+        spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
       }
+
+      // Ukázat výsledek a barvu
+      odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+      zobrazVysledek(aktualniPriklad);
+
+      // Po 1s vygenerovat nový příklad a vrátit focus
+      setTimeout(() => {
+        const novyPriklad = vygenerujPriklad();
+        if (novyPriklad) {
+          aktualniPriklad = novyPriklad;
+          zobrazPriklad(novyPriklad);
+          odpovedEl.value = '';
+          odpovedEl.classList.remove('zelene', 'cervene');
+          caraEl.style.visibility = 'hidden';
+          vysledekEl.style.visibility = 'hidden';
+        }
+        odpovedEl.focus();
+      }, 800);
     }
 
-    // === Události ===
-    tlacitkoEl.addEventListener('click', handleTlacitko);
-
-    // Enter na tlačítku
-    tlacitkoEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleTlacitko();
-      }
+    // === START ===
+    tlacitkoEl.addEventListener('click', () => {
+      const p = vygenerujPriklad();
+      if (!p) return;
+      aktualniPriklad = p;
+      zobrazPriklad(p);
+      odpovedEl.value = '';
+      odpovedEl.classList.remove('zelene', 'cervene');
+      caraEl.style.visibility = 'hidden';
+      vysledekEl.style.visibility = 'hidden';
+      tlacitkoEl.style.display = 'none';
+      odpovedEl.focus();
     });
 
-    // Enter ve vstupním poli
+    // === Enter ve vstupním poli → kontrola odpovědi ===
     odpovedEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        handleTlacitko();
+        zkontrolujOdpoved();
       }
     });
 
