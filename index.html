@@ -170,22 +170,14 @@
             appearance: none;
         }
 
-        #odpoved:read-only {
-            background-color: #f0f0f0;
-            color: #999;
-            cursor: default;
-        }
-
         #odpoved.zelene {
             background-color: #d4edda;
             border-color: #28a745;
-            color: #000;
         }
 
         #odpoved.cervene {
             background-color: #f8d7da;
             border-color: #dc3545;
-            color: #000;
         }
 
         .napoveda {
@@ -252,8 +244,8 @@
         </div>
 
         <div class="odpoved-oblast">
-            <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" readonly />
-            <div class="napoveda" id="napoveda">👆 Zmáčkni START pro vygenerování příkladu</div>
+            <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" />
+            <div class="napoveda" id="napoveda"></div>
         </div>
 
         <div class="tlacitka">
@@ -387,9 +379,7 @@
                 prikladAktivni = false;
                 tlacitkoStart.disabled = false;
                 tlacitkoVysledek.disabled = true;
-                odpovedEl.readOnly = true;
-                napovedaEl.textContent = '👆 Zmáčkni START pro vygenerování příkladu';
-                odpovedEl.focus();
+                napovedaEl.textContent = '';
                 return;
             }
 
@@ -400,13 +390,13 @@
 
             tlacitkoStart.disabled = true;
             tlacitkoVysledek.disabled = false;
-            odpovedEl.readOnly = false;
             napovedaEl.textContent = '⌨️ Zadej výsledek a stiskni Enter na klávesnici';
 
-            // Dát fokus do pole -> klávesnice už je otevřená, jen se přepne do režimu zápisu
+            // Dát fokus do pole -> otevře klávesnici
             setTimeout(function() {
                 odpovedEl.focus();
-            }, 50);
+                odpovedEl.click();
+            }, 100);
         }
 
         // === AKCE: VÝSLEDEK ===
@@ -438,10 +428,9 @@
             prikladAktivni = false;
             tlacitkoStart.disabled = false;
             tlacitkoVysledek.disabled = true;
-            odpovedEl.readOnly = true;
             napovedaEl.textContent = '✅ Stiskni START pro další příklad';
 
-            // Fokus zůstane na poli (klávesnice nezmizí), ale pole je readonly
+            // Necháme fokus na poli, klávesnice zůstane
             setTimeout(function() {
                 odpovedEl.focus();
             }, 50);
@@ -461,39 +450,32 @@
             akceVysledek();
         });
 
-        // Enter v poli = VÝSLEDEK (funguje jen když není readonly)
+        // KLÍČOVÉ: Enter v poli = VÝSLEDEK
         odpovedEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                if (prikladAktivni && !odpovedEl.readOnly) {
+                if (prikladAktivni) {
                     akceVysledek();
                 }
             }
         });
 
-        // Blokovat psaní když je readonly (pro jistotu)
-        odpovedEl.addEventListener('keydown', function(e) {
-            if (odpovedEl.readOnly && e.key !== 'Tab') {
-                e.preventDefault();
-            }
-        });
-
-        // Blokovat vkládání když je readonly
-        odpovedEl.addEventListener('paste', function(e) {
-            if (odpovedEl.readOnly) {
-                e.preventDefault();
+        // Po VÝSLEDKU: pokud uživatel začne psát nové číslo,
+        // automaticky spustit nový příklad
+        odpovedEl.addEventListener('input', function() {
+            if (!prikladAktivni && odpovedEl.value.length === 1) {
+                // Uživatel začal psát -> automatický START
+                akceStart();
+                // Vrátit ten první znak
+                const znak = odpovedEl.value;
+                odpovedEl.value = znak;
             }
         });
 
         // === Inicializace ===
         naplnSelecty();
         operaceEl.value = '+';
-
-        // Hned po načtení dát focus -> otevře číselnou klávesnici
-        // Pole je readonly, takže se do něj nedá psát
-        setTimeout(function() {
-            odpovedEl.focus();
-        }, 300);
+        napovedaEl.textContent = '👆 Zmáčkni START pro vygenerování příkladu';
     </script>
 </body>
 </html>
