@@ -11,7 +11,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #e8edf2;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -21,10 +21,10 @@
         }
 
         .container {
-            background: white;
+            background: #f4f6f9;
             padding: 15px 20px;
             border-radius: 16px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
             width: 95%;
             max-width: 500px;
             text-align: center;
@@ -155,6 +155,7 @@
             border: 2px solid #ccc;
             border-radius: 8px;
             width: 180px;
+            background: white;
             transition: border-color 0.3s, background-color 0.3s;
             -webkit-appearance: none;
             appearance: none;
@@ -352,14 +353,10 @@
 
         // === Jadro řešení: udržení klávesnice ===
         function aktivujPole() {
-            // Trik: readonly -> focus -> odstranit readonly
-            // Tohle spolehlivě otevře klávesnici i na mobilu
             odpovedEl.readOnly = true;
             odpovedEl.focus();
             odpovedEl.readOnly = false;
 
-            // Ještě pojistka: pokud prohlížeč nespolupracuje,
-            // zkusíme klasický focus s malým zpožděním
             setTimeout(function() {
                 if (document.activeElement !== odpovedEl) {
                     odpovedEl.focus();
@@ -368,29 +365,24 @@
         }
 
         function vratKlavesnici() {
-            // Zkontrolujeme, jestli pole nemá fokus
             if (document.activeElement !== odpovedEl) {
                 aktivujPole();
             }
-            // I když má fokus, pro jistotu klikneme pro mobilní prohlížeče
             odpovedEl.click();
         }
 
         // === Obsluha tlačítka ===
         function handleTlacitko(e) {
-            // Úplně zabráníme výchozímu chování
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
 
-            // Zjistíme, jestli je klávesnice aktivní
             klavesniceBylaAktivni = (document.activeElement === odpovedEl);
 
             odpovedEl.classList.remove('zelene', 'cervene');
 
             if (!zobrazitVysledek) {
-                // === START ===
                 const p = vygenerujPriklad();
                 if (!p) {
                     tlacitkoEl.textContent = 'START';
@@ -404,12 +396,10 @@
                 tlacitkoEl.textContent = 'VÝSLEDEK';
                 zobrazitVysledek = true;
 
-                // Aktivovat pole s klávesnicí
                 setTimeout(function() {
                     aktivujPole();
                 }, 100);
             } else {
-                // === VÝSLEDEK ===
                 const uziv = odpovedEl.value;
                 const norm = normalizuj(uziv);
 
@@ -434,7 +424,6 @@
                 tlacitkoEl.textContent = 'START';
                 zobrazitVysledek = false;
 
-                // Okamžitě vrátit klávesnici
                 setTimeout(function() {
                     vratKlavesnici();
                 }, 50);
@@ -445,20 +434,16 @@
 
         // === Události na tlačítku ===
 
-        // Touchstart – nejdůležitější pro mobil!
-        // Zachytíme dotek dřív, než prohlížeč stáhne klávesnici
         tlacitkoEl.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Zabráníme výchozí akci (ztráta fokusu)
+            e.preventDefault();
             handleTlacitko(e);
         }, { passive: false });
 
-        // Click jako záloha pro desktop
         tlacitkoEl.addEventListener('click', function(e) {
             e.preventDefault();
             handleTlacitko(e);
         });
 
-        // Enter na tlačítku (když má fokus)
         tlacitkoEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -466,7 +451,6 @@
             }
         });
 
-        // Enter ve vstupním poli
         odpovedEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -474,12 +458,8 @@
             }
         });
 
-        // Když pole ztratí fokus nečekaně
         odpovedEl.addEventListener('blur', function() {
             if (zobrazitVysledek) {
-                // Malé zpoždění – pokud blur způsobil touch na tlačítku,
-                // handleTlacitko vrátí fokus. Pokud to bylo něco jiného,
-                // taky vrátíme fokus.
                 setTimeout(function() {
                     if (zobrazitVysledek && document.activeElement !== odpovedEl) {
                         vratKlavesnici();
@@ -488,7 +468,6 @@
             }
         });
 
-        // Pro selecty – po změně vrátit fokus
         [operaceEl, cislice1El, cislice2El].forEach(function(el) {
             el.addEventListener('change', function() {
                 if (zobrazitVysledek) {
