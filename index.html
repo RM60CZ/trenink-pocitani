@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trénink počítání</title>
     <style>
         * {
@@ -11,7 +11,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e8edf2;
+            background-color: #2d2d3a;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -21,17 +21,17 @@
         }
 
         .container {
-            background: #f4f6f9;
+            background: #3a3a4a;
             padding: 15px 20px;
             border-radius: 16px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
             width: 95%;
             max-width: 500px;
             text-align: center;
         }
 
         h1 {
-            color: #3498db;
+            color: #5dade2;
             margin-top: 0;
             margin-bottom: 12px;
             font-size: 1.8rem;
@@ -55,19 +55,19 @@
         label {
             font-weight: bold;
             margin-bottom: 4px;
-            color: #34495e;
+            color: #b0b0c0;
         }
 
         .label-top {
             font-weight: bold;
-            color: #34495e;
+            color: #b0b0c0;
             line-height: 1.2;
             font-size: 0.85rem;
         }
 
         .label-bottom {
             font-weight: bold;
-            color: #34495e;
+            color: #b0b0c0;
             margin-bottom: 4px;
             font-size: 0.85rem;
         }
@@ -75,9 +75,10 @@
         select {
             padding: 6px 4px;
             font-size: 1rem;
-            border: 1px solid #ccc;
+            border: 1px solid #5a5a6a;
             border-radius: 8px;
-            background: white;
+            background: #2d2d3a;
+            color: #e0e0e0;
             width: 55px;
         }
 
@@ -85,31 +86,42 @@
             width: 60px;
         }
 
-        #tlacitko {
-            display: block;
+        .tlacitka {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        button {
             padding: 8px 14px;
             font-size: 1rem;
             border: none;
             border-radius: 8px;
-            background-color: #3498db;
-            color: white;
+            background-color: #5dade2;
+            color: #1a1a2e;
             cursor: pointer;
             font-weight: bold;
             transition: background 0.2s;
             min-width: 120px;
-            margin: 4px auto 0;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
         }
 
-        #tlacitko:hover {
-            background-color: #2980b9;
+        button:hover {
+            background-color: #4a9cd4;
         }
 
-        #tlacitko:active {
-            background-color: #1c6ea4;
+        button:active {
+            background-color: #3a8cc4;
+        }
+
+        button:disabled {
+            background-color: #5a5a6a;
+            color: #8a8a9a;
+            cursor: default;
         }
 
         .priklad-oblast {
@@ -128,15 +140,16 @@
             line-height: 1.15;
             white-space: pre;
             text-align: right;
+            color: #e8e8f0;
         }
 
         .cara {
-            color: #2c3e50;
+            color: #8a8a9a;
             visibility: hidden;
         }
 
         .result-line {
-            color: #27ae60;
+            color: #58d68d;
             font-weight: bold;
             visibility: hidden;
         }
@@ -152,24 +165,52 @@
             padding: 8px;
             font-size: 1.2rem;
             text-align: center;
-            border: 2px solid #ccc;
+            border: 2px solid #5a5a6a;
             border-radius: 8px;
             width: 180px;
-            background: white;
             transition: border-color 0.3s, background-color 0.3s;
+            background: #2d2d3a;
+            color: #e0e0e0;
             -webkit-appearance: none;
             appearance: none;
-            pattern: "[0-9.,\-]*";
+        }
+
+        #odpoved:read-only {
+            background-color: #353545;
+            color: #a0a0b0;
+            cursor: default;
+            border-color: #4a4a5a;
         }
 
         #odpoved.zelene {
-            background-color: #d4edda;
-            border-color: #28a745;
+            background-color: #1a3a2a;
+            border-color: #58d68d;
+            color: #e0e0e0;
         }
 
         #odpoved.cervene {
-            background-color: #f8d7da;
-            border-color: #dc3545;
+            background-color: #3a1a1a;
+            border-color: #e74c3c;
+            color: #e0e0e0;
+        }
+
+        /* Zachovat barvu i v readonly */
+        #odpoved.zelene:read-only {
+            background-color: #1a3a2a;
+            border-color: #58d68d;
+            color: #a0a0b0;
+        }
+
+        #odpoved.cervene:read-only {
+            background-color: #3a1a1a;
+            border-color: #e74c3c;
+            color: #a0a0b0;
+        }
+
+        .napoveda {
+            color: #8a8a9a;
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
 
         .error {
@@ -231,12 +272,25 @@
 
         <div class="odpoved-oblast">
             <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" />
+            <div class="napoveda" id="napoveda">👆 Zmáčkni START pro vygenerování příkladu</div>
         </div>
 
-        <button id="tlacitko" type="button">START</button>
+        <div class="tlacitka">
+            <button id="tlacitkoDesktop">START</button>
+            <button id="tlacitkoStartMobil" style="display: none;">START</button>
+            <button id="tlacitkoVysledekMobil" style="display: none;" disabled>VÝSLEDEK</button>
+        </div>
     </div>
 
     <script>
+        // === Detekce mobilu ===
+        function jeMobil() {
+            return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) ||
+                   ('ontouchstart' in window && window.innerWidth < 768);
+        }
+
+        const mobil = jeMobil();
+
         // === Pomocné funkce ===
         function formatujCislo(x) {
             if (typeof x === 'bigint') {
@@ -263,8 +317,7 @@
 
         // === Globální proměnné ===
         let aktualniPriklad = null;
-        let zobrazitVysledek = false;
-        let klavesniceBylaAktivni = false;
+        let prikladAktivni = false;
 
         // === DOM elementy ===
         const operaceEl = document.getElementById('operace');
@@ -275,7 +328,21 @@
         const caraEl = document.getElementById('cara');
         const vysledekEl = document.getElementById('vysledek');
         const odpovedEl = document.getElementById('odpoved');
-        const tlacitkoEl = document.getElementById('tlacitko');
+        const napovedaEl = document.getElementById('napoveda');
+        const tlacitkoDesktop = document.getElementById('tlacitkoDesktop');
+        const tlacitkoStartMobil = document.getElementById('tlacitkoStartMobil');
+        const tlacitkoVysledekMobil = document.getElementById('tlacitkoVysledekMobil');
+
+        // === Nastavení tlačítek podle zařízení ===
+        if (mobil) {
+            tlacitkoDesktop.style.display = 'none';
+            tlacitkoStartMobil.style.display = 'inline-block';
+            tlacitkoVysledekMobil.style.display = 'inline-block';
+        } else {
+            tlacitkoDesktop.style.display = 'inline-block';
+            tlacitkoStartMobil.style.display = 'none';
+            tlacitkoVysledekMobil.style.display = 'none';
+        }
 
         // === Naplnění selectů ===
         function naplnSelecty() {
@@ -351,139 +418,171 @@
             vysledekEl.style.visibility = 'visible';
         }
 
-        // === Jadro řešení: udržení klávesnice ===
-        function aktivujPole() {
-            odpovedEl.readOnly = true;
-            odpovedEl.focus();
-            odpovedEl.readOnly = false;
+        // === Aktualizace UI tlačítek a zámku pole ===
+        function aktualizujUI() {
+            if (prikladAktivni) {
+                // Jsme v režimu VÝSLEDEK -> pole odemknuté
+                odpovedEl.readOnly = false;
 
-            setTimeout(function() {
-                if (document.activeElement !== odpovedEl) {
-                    odpovedEl.focus();
+                if (mobil) {
+                    tlacitkoStartMobil.disabled = true;
+                    tlacitkoVysledekMobil.disabled = false;
+                } else {
+                    tlacitkoDesktop.textContent = 'VÝSLEDEK';
+                    tlacitkoDesktop.disabled = false;
                 }
-            }, 100);
+            } else {
+                // Jsme v režimu START -> pole zamknuté, ale hodnota zůstává
+                odpovedEl.readOnly = true;
+
+                if (mobil) {
+                    tlacitkoStartMobil.disabled = false;
+                    tlacitkoVysledekMobil.disabled = true;
+                } else {
+                    tlacitkoDesktop.textContent = 'START';
+                    tlacitkoDesktop.disabled = false;
+                }
+            }
         }
 
-        function vratKlavesnici() {
-            if (document.activeElement !== odpovedEl) {
-                aktivujPole();
-            }
-            odpovedEl.click();
-        }
-
-        // === Obsluha tlačítka ===
-        function handleTlacitko(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            klavesniceBylaAktivni = (document.activeElement === odpovedEl);
-
+        // === AKCE: START ===
+        function akceStart() {
+            // Při STARTu NEsmažeme hodnotu - zůstane vidět
+            // Odstraníme jen obarvení, pokud tam bylo
             odpovedEl.classList.remove('zelene', 'cervene');
 
-            if (!zobrazitVysledek) {
-                const p = vygenerujPriklad();
-                if (!p) {
-                    tlacitkoEl.textContent = 'START';
-                    zobrazitVysledek = false;
-                    setTimeout(vratKlavesnici, 150);
-                    return;
-                }
-                aktualniPriklad = p;
-                zobrazPriklad(p);
-                odpovedEl.value = '';
-                tlacitkoEl.textContent = 'VÝSLEDEK';
-                zobrazitVysledek = true;
-
-                setTimeout(function() {
-                    aktivujPole();
-                }, 100);
-            } else {
-                const uziv = odpovedEl.value;
-                const norm = normalizuj(uziv);
-
-                if (norm === '') {
-                    zobrazVysledek(aktualniPriklad);
-                } else {
-                    let spravne = false;
-                    const v = aktualniPriklad.vysledek;
-                    if (typeof v === 'bigint') {
-                        try {
-                            spravne = BigInt(norm) === v;
-                        } catch {
-                            spravne = false;
-                        }
-                    } else if (typeof v === 'number') {
-                        const num = parseFloat(norm);
-                        spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
-                    }
-                    odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    zobrazVysledek(aktualniPriklad);
-                }
-                tlacitkoEl.textContent = 'START';
-                zobrazitVysledek = false;
-
-                setTimeout(function() {
-                    vratKlavesnici();
-                }, 50);
+            const p = vygenerujPriklad();
+            if (!p) {
+                prikladAktivni = false;
+                aktualizujUI();
+                napovedaEl.textContent = '👆 Zmáčkni START pro vygenerování příkladu';
+                return;
             }
 
-            return false;
+            aktualniPriklad = p;
+            zobrazPriklad(p);
+
+            // Vyčistíme pole pro nový příklad
+            odpovedEl.value = '';
+
+            prikladAktivni = true;
+            aktualizujUI();
+
+            if (mobil) {
+                napovedaEl.textContent = '⌨️ Zadej výsledek a stiskni Enter na klávesnici';
+            } else {
+                napovedaEl.textContent = 'Zadej výsledek a stiskni Enter nebo VÝSLEDEK';
+            }
+
+            // Fokus do pole
+            setTimeout(function() {
+                odpovedEl.focus();
+            }, 50);
         }
 
-        // === Události na tlačítku ===
+        // === AKCE: VÝSLEDEK ===
+        function akceVysledek() {
+            if (!prikladAktivni) return;
 
-        tlacitkoEl.addEventListener('touchstart', function(e) {
+            const uziv = odpovedEl.value;
+            const norm = normalizuj(uziv);
+
+            if (norm === '') {
+                zobrazVysledek(aktualniPriklad);
+            } else {
+                let spravne = false;
+                const v = aktualniPriklad.vysledek;
+                if (typeof v === 'bigint') {
+                    try {
+                        spravne = BigInt(norm) === v;
+                    } catch {
+                        spravne = false;
+                    }
+                } else if (typeof v === 'number') {
+                    const num = parseFloat(norm);
+                    spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
+                }
+                odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                zobrazVysledek(aktualniPriklad);
+            }
+
+            prikladAktivni = false;
+            aktualizujUI();
+            napovedaEl.textContent = '✅ Stiskni START pro další příklad';
+
+            // Fokus zůstane na poli (je readonly, hodnota vidět)
+            setTimeout(function() {
+                odpovedEl.focus();
+            }, 50);
+        }
+
+        // === Události ===
+
+        // Desktop tlačítko
+        tlacitkoDesktop.addEventListener('click', function(e) {
             e.preventDefault();
-            handleTlacitko(e);
-        }, { passive: false });
-
-        tlacitkoEl.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleTlacitko(e);
-        });
-
-        tlacitkoEl.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleTlacitko(e);
+            if (prikladAktivni) {
+                akceVysledek();
+            } else {
+                akceStart();
             }
         });
 
+        // Mobil tlačítko START
+        tlacitkoStartMobil.addEventListener('click', function(e) {
+            e.preventDefault();
+            akceStart();
+        });
+
+        // Mobil tlačítko VÝSLEDEK
+        tlacitkoVysledekMobil.addEventListener('click', function(e) {
+            e.preventDefault();
+            akceVysledek();
+        });
+
+        // Enter v poli = VÝSLEDEK
         odpovedEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                handleTlacitko(e);
+                if (prikladAktivni) {
+                    akceVysledek();
+                }
             }
         });
 
-        odpovedEl.addEventListener('blur', function() {
-            if (zobrazitVysledek) {
-                setTimeout(function() {
-                    if (zobrazitVysledek && document.activeElement !== odpovedEl) {
-                        vratKlavesnici();
-                    }
-                }, 200);
+        // Zamezit psaní do readonly pole i přes jiné cesty
+        odpovedEl.addEventListener('keydown', function(e) {
+            if (odpovedEl.readOnly && e.key !== 'Tab') {
+                e.preventDefault();
             }
         });
 
-        [operaceEl, cislice1El, cislice2El].forEach(function(el) {
-            el.addEventListener('change', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-            });
-            el.addEventListener('blur', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-            });
+        odpovedEl.addEventListener('paste', function(e) {
+            if (odpovedEl.readOnly) {
+                e.preventDefault();
+            }
+        });
+
+        odpovedEl.addEventListener('input', function() {
+            if (odpovedEl.readOnly) {
+                // Pro jistotu - pokud se něco propašuje
+                odpovedEl.value = odpovedEl._posledniHodnota || '';
+            }
         });
 
         // === Inicializace ===
         naplnSelecty();
         operaceEl.value = '+';
+
+        // Výchozí stav: pole zamknuté
+        odpovedEl.readOnly = true;
+
+        // Na mobilu hned fokus -> otevře číselnou klávesnici
+        if (mobil) {
+            setTimeout(function() {
+                odpovedEl.focus();
+            }, 300);
+        }
     </script>
 </body>
 </html>
