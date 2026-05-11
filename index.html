@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trénink počítání</title>
     <style>
         * {
@@ -85,8 +85,15 @@
             width: 60px;
         }
 
-        #tlacitko {
-            display: block;
+        .tlacitka {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        button {
             padding: 8px 14px;
             font-size: 1rem;
             border: none;
@@ -96,20 +103,23 @@
             cursor: pointer;
             font-weight: bold;
             transition: background 0.2s;
-            min-width: 120px;
-            margin: 4px auto 0;
+            min-width: 100px;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
         }
 
-        #tlacitko:hover {
+        button:hover {
             background-color: #2980b9;
         }
 
-        #tlacitko:active {
+        button:active {
             background-color: #1c6ea4;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: default;
         }
 
         .priklad-oblast {
@@ -158,17 +168,30 @@
             transition: border-color 0.3s, background-color 0.3s;
             -webkit-appearance: none;
             appearance: none;
-            pattern: "[0-9.,\-]*";
+        }
+
+        #odpoved:read-only {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: default;
         }
 
         #odpoved.zelene {
             background-color: #d4edda;
             border-color: #28a745;
+            color: #000;
         }
 
         #odpoved.cervene {
             background-color: #f8d7da;
             border-color: #dc3545;
+            color: #000;
+        }
+
+        .napoveda {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
 
         .error {
@@ -229,10 +252,14 @@
         </div>
 
         <div class="odpoved-oblast">
-            <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" />
+            <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" readonly />
+            <div class="napoveda" id="napoveda">👆 Zmáčkni START pro vygenerování příkladu</div>
         </div>
 
-        <button id="tlacitko" type="button">START</button>
+        <div class="tlacitka">
+            <button id="tlacitkoStart">START</button>
+            <button id="tlacitkoVysledek" disabled>VÝSLEDEK</button>
+        </div>
     </div>
 
     <script>
@@ -262,8 +289,7 @@
 
         // === Globální proměnné ===
         let aktualniPriklad = null;
-        let zobrazitVysledek = false;
-        let klavesniceBylaAktivni = false;
+        let prikladAktivni = false;
 
         // === DOM elementy ===
         const operaceEl = document.getElementById('operace');
@@ -274,7 +300,9 @@
         const caraEl = document.getElementById('cara');
         const vysledekEl = document.getElementById('vysledek');
         const odpovedEl = document.getElementById('odpoved');
-        const tlacitkoEl = document.getElementById('tlacitko');
+        const napovedaEl = document.getElementById('napoveda');
+        const tlacitkoStart = document.getElementById('tlacitkoStart');
+        const tlacitkoVysledek = document.getElementById('tlacitkoVysledek');
 
         // === Naplnění selectů ===
         function naplnSelecty() {
@@ -350,161 +378,122 @@
             vysledekEl.style.visibility = 'visible';
         }
 
-        // === Jadro řešení: udržení klávesnice ===
-        function aktivujPole() {
-            // Trik: readonly -> focus -> odstranit readonly
-            // Tohle spolehlivě otevře klávesnici i na mobilu
-            odpovedEl.readOnly = true;
-            odpovedEl.focus();
-            odpovedEl.readOnly = false;
-
-            // Ještě pojistka: pokud prohlížeč nespolupracuje,
-            // zkusíme klasický focus s malým zpožděním
-            setTimeout(function() {
-                if (document.activeElement !== odpovedEl) {
-                    odpovedEl.focus();
-                }
-            }, 100);
-        }
-
-        function vratKlavesnici() {
-            // Zkontrolujeme, jestli pole nemá fokus
-            if (document.activeElement !== odpovedEl) {
-                aktivujPole();
-            }
-            // I když má fokus, pro jistotu klikneme pro mobilní prohlížeče
-            odpovedEl.click();
-        }
-
-        // === Obsluha tlačítka ===
-        function handleTlacitko(e) {
-            // Úplně zabráníme výchozímu chování
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            // Zjistíme, jestli je klávesnice aktivní
-            klavesniceBylaAktivni = (document.activeElement === odpovedEl);
-
+        // === AKCE: START ===
+        function akceStart() {
             odpovedEl.classList.remove('zelene', 'cervene');
 
-            if (!zobrazitVysledek) {
-                // === START ===
-                const p = vygenerujPriklad();
-                if (!p) {
-                    tlacitkoEl.textContent = 'START';
-                    zobrazitVysledek = false;
-                    setTimeout(vratKlavesnici, 150);
-                    return;
-                }
-                aktualniPriklad = p;
-                zobrazPriklad(p);
-                odpovedEl.value = '';
-                tlacitkoEl.textContent = 'VÝSLEDEK';
-                zobrazitVysledek = true;
-
-                // Aktivovat pole s klávesnicí
-                setTimeout(function() {
-                    aktivujPole();
-                }, 100);
-            } else {
-                // === VÝSLEDEK ===
-                const uziv = odpovedEl.value;
-                const norm = normalizuj(uziv);
-
-                if (norm === '') {
-                    zobrazVysledek(aktualniPriklad);
-                } else {
-                    let spravne = false;
-                    const v = aktualniPriklad.vysledek;
-                    if (typeof v === 'bigint') {
-                        try {
-                            spravne = BigInt(norm) === v;
-                        } catch {
-                            spravne = false;
-                        }
-                    } else if (typeof v === 'number') {
-                        const num = parseFloat(norm);
-                        spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
-                    }
-                    odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    zobrazVysledek(aktualniPriklad);
-                }
-                tlacitkoEl.textContent = 'START';
-                zobrazitVysledek = false;
-
-                // Okamžitě vrátit klávesnici
-                setTimeout(function() {
-                    vratKlavesnici();
-                }, 50);
+            const p = vygenerujPriklad();
+            if (!p) {
+                prikladAktivni = false;
+                tlacitkoStart.disabled = false;
+                tlacitkoVysledek.disabled = true;
+                odpovedEl.readOnly = true;
+                napovedaEl.textContent = '👆 Zmáčkni START pro vygenerování příkladu';
+                odpovedEl.focus();
+                return;
             }
 
-            return false;
+            aktualniPriklad = p;
+            zobrazPriklad(p);
+            odpovedEl.value = '';
+            prikladAktivni = true;
+
+            tlacitkoStart.disabled = true;
+            tlacitkoVysledek.disabled = false;
+            odpovedEl.readOnly = false;
+            napovedaEl.textContent = '⌨️ Zadej výsledek a stiskni Enter na klávesnici';
+
+            // Dát fokus do pole -> klávesnice už je otevřená, jen se přepne do režimu zápisu
+            setTimeout(function() {
+                odpovedEl.focus();
+            }, 50);
         }
 
-        // === Události na tlačítku ===
+        // === AKCE: VÝSLEDEK ===
+        function akceVysledek() {
+            if (!prikladAktivni) return;
 
-        // Touchstart – nejdůležitější pro mobil!
-        // Zachytíme dotek dřív, než prohlížeč stáhne klávesnici
-        tlacitkoEl.addEventListener('touchstart', function(e) {
-            e.preventDefault(); // Zabráníme výchozí akci (ztráta fokusu)
-            handleTlacitko(e);
-        }, { passive: false });
+            const uziv = odpovedEl.value;
+            const norm = normalizuj(uziv);
 
-        // Click jako záloha pro desktop
-        tlacitkoEl.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleTlacitko(e);
-        });
-
-        // Enter na tlačítku (když má fokus)
-        tlacitkoEl.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleTlacitko(e);
+            if (norm === '') {
+                zobrazVysledek(aktualniPriklad);
+            } else {
+                let spravne = false;
+                const v = aktualniPriklad.vysledek;
+                if (typeof v === 'bigint') {
+                    try {
+                        spravne = BigInt(norm) === v;
+                    } catch {
+                        spravne = false;
+                    }
+                } else if (typeof v === 'number') {
+                    const num = parseFloat(norm);
+                    spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
+                }
+                odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                zobrazVysledek(aktualniPriklad);
             }
+
+            prikladAktivni = false;
+            tlacitkoStart.disabled = false;
+            tlacitkoVysledek.disabled = true;
+            odpovedEl.readOnly = true;
+            napovedaEl.textContent = '✅ Stiskni START pro další příklad';
+
+            // Fokus zůstane na poli (klávesnice nezmizí), ale pole je readonly
+            setTimeout(function() {
+                odpovedEl.focus();
+            }, 50);
+        }
+
+        // === Události ===
+
+        // Tlačítko START
+        tlacitkoStart.addEventListener('click', function(e) {
+            e.preventDefault();
+            akceStart();
         });
 
-        // Enter ve vstupním poli
+        // Tlačítko VÝSLEDEK
+        tlacitkoVysledek.addEventListener('click', function(e) {
+            e.preventDefault();
+            akceVysledek();
+        });
+
+        // Enter v poli = VÝSLEDEK (funguje jen když není readonly)
         odpovedEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                handleTlacitko(e);
+                if (prikladAktivni && !odpovedEl.readOnly) {
+                    akceVysledek();
+                }
             }
         });
 
-        // Když pole ztratí fokus nečekaně
-        odpovedEl.addEventListener('blur', function() {
-            if (zobrazitVysledek) {
-                // Malé zpoždění – pokud blur způsobil touch na tlačítku,
-                // handleTlacitko vrátí fokus. Pokud to bylo něco jiného,
-                // taky vrátíme fokus.
-                setTimeout(function() {
-                    if (zobrazitVysledek && document.activeElement !== odpovedEl) {
-                        vratKlavesnici();
-                    }
-                }, 200);
+        // Blokovat psaní když je readonly (pro jistotu)
+        odpovedEl.addEventListener('keydown', function(e) {
+            if (odpovedEl.readOnly && e.key !== 'Tab') {
+                e.preventDefault();
             }
         });
 
-        // Pro selecty – po změně vrátit fokus
-        [operaceEl, cislice1El, cislice2El].forEach(function(el) {
-            el.addEventListener('change', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-            });
-            el.addEventListener('blur', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-            });
+        // Blokovat vkládání když je readonly
+        odpovedEl.addEventListener('paste', function(e) {
+            if (odpovedEl.readOnly) {
+                e.preventDefault();
+            }
         });
 
         // === Inicializace ===
         naplnSelecty();
         operaceEl.value = '+';
+
+        // Hned po načtení dát focus -> otevře číselnou klávesnici
+        // Pole je readonly, takže se do něj nedá psát
+        setTimeout(function() {
+            odpovedEl.focus();
+        }, 300);
     </script>
 </body>
 </html>
