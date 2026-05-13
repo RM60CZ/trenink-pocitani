@@ -94,8 +94,19 @@
             width: 60px;
         }
 
-        /* Přepínač pozadí */
+        /* Přepínač pozadí - upraveno */
         .toggle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .toggle-container .label-top {
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+
+        .toggle-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -146,11 +157,12 @@
         }
 
         .toggle-text {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: bold;
             color: #cccccc;
-            min-width: 35px;
+            text-align: center;
             transition: color 0.3s ease;
+            min-height: 1.2em;
         }
 
         #tlacitko {
@@ -362,11 +374,13 @@
 
             <div class="toggle-container">
                 <span class="label-top">Pozadí</span>
-                <label class="toggle-label" for="pozadi-toggle">
-                    <input type="checkbox" id="pozadi-toggle" />
-                    <span class="toggle-switch"></span>
-                    <span class="toggle-text">Šedé</span>
-                </label>
+                <div class="toggle-wrapper">
+                    <label class="toggle-label" for="pozadi-toggle">
+                        <input type="checkbox" id="pozadi-toggle" />
+                        <span class="toggle-switch"></span>
+                    </label>
+                    <span class="toggle-text" id="pozadi-text">světlé</span>
+                </div>
             </div>
         </div>
 
@@ -447,12 +461,15 @@
 
                 // Nastavení pozadí
                 const pozadiCheckbox = document.getElementById('pozadi-toggle');
+                const pozadiText = document.getElementById('pozadi-text');
                 if (pozadiCheckbox && nastaveni.sedyRezim) {
                     pozadiCheckbox.checked = true;
                     document.body.classList.add('sedy-rezim');
+                    if (pozadiText) pozadiText.textContent = 'tmavé';
                 } else if (pozadiCheckbox) {
                     pozadiCheckbox.checked = false;
                     document.body.classList.remove('sedy-rezim');
+                    if (pozadiText) pozadiText.textContent = 'světlé';
                 }
 
                 return true;
@@ -478,6 +495,7 @@
         const odpovedEl = document.getElementById('odpoved');
         const tlacitkoEl = document.getElementById('tlacitko');
         const pozadiToggleEl = document.getElementById('pozadi-toggle');
+        const pozadiTextEl = document.getElementById('pozadi-text');
 
         // === Naplnění selectů ===
         function naplnSelecty() {
@@ -690,12 +708,14 @@
             });
         });
 
-        // Přepínač pozadí
+        // Přepínač pozadí - upraveno pro dynamický text
         pozadiToggleEl.addEventListener('change', function() {
             if (this.checked) {
                 document.body.classList.add('sedy-rezim');
+                pozadiTextEl.textContent = 'tmavé';
             } else {
                 document.body.classList.remove('sedy-rezim');
+                pozadiTextEl.textContent = 'světlé';
             }
             ulozNastaveni();
         });
@@ -711,6 +731,8 @@
             operaceEl.value = '+';
             cislice1El.value = '2';
             cislice2El.value = '1';
+            // Výchozí text pro tmavý režim
+            pozadiTextEl.textContent = 'světlé';
         }
 
         // Ihned po načtení focus na vstup
