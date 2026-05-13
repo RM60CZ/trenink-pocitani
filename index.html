@@ -42,11 +42,11 @@
 
         .controls {
             margin: 0 0 10px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
+            display: grid;
+            grid-template-columns: auto auto auto auto;
             gap: 10px;
+            justify-content: center;
+            align-items: end;
         }
 
         .control-group {
@@ -94,7 +94,6 @@
             width: 60px;
         }
 
-        /* Přepínač pozadí */
         .pozadi-group {
             display: flex;
             flex-direction: column;
@@ -115,7 +114,6 @@
             font-size: 0.85rem;
             line-height: 1.2;
             margin-bottom: 4px;
-            margin-top: -16px;
             transition: color 0.3s ease;
         }
 
@@ -344,6 +342,7 @@
         <h1>Trénink počítání</h1>
 
         <div class="controls">
+            <!-- Sloupec 1: Operace -->
             <div class="control-group">
                 <label for="operace">Operace:</label>
                 <select id="operace">
@@ -354,18 +353,21 @@
                 </select>
             </div>
 
+            <!-- Sloupec 2: 1. čísla -->
             <div class="control-group">
                 <span class="label-top">Počet číslic</span>
                 <span class="label-bottom">1. čísla:</span>
                 <select id="cislice1"></select>
             </div>
 
+            <!-- Sloupec 3: 2. čísla -->
             <div class="control-group">
                 <span class="label-top">Počet číslic</span>
                 <span class="label-bottom">2. čísla:</span>
                 <select id="cislice2"></select>
             </div>
 
+            <!-- Sloupec 4: Pozadí -->
             <div class="pozadi-group">
                 <span class="pozadi-top">Pozadí</span>
                 <span class="pozadi-bottom" id="pozadi-text">světlé</span>
@@ -438,12 +440,10 @@
             try {
                 const nastaveni = JSON.parse(ulozeno);
 
-                // Nastavení operace
                 if (['+', '-', '*', '/'].includes(nastaveni.operace)) {
                     operaceEl.value = nastaveni.operace;
                 }
 
-                // Nastavení počtu číslic (kontrola platných hodnot 1-9)
                 if (nastaveni.cislice1 >= 1 && nastaveni.cislice1 <= 9) {
                     cislice1El.value = nastaveni.cislice1;
                 }
@@ -451,7 +451,6 @@
                     cislice2El.value = nastaveni.cislice2;
                 }
 
-                // Nastavení pozadí
                 const pozadiCheckbox = document.getElementById('pozadi-toggle');
                 const pozadiText = document.getElementById('pozadi-text');
                 if (pozadiCheckbox && nastaveni.sedyRezim) {
@@ -474,7 +473,6 @@
         // === Globální proměnné ===
         let aktualniPriklad = null;
         let zobrazitVysledek = false;
-        let klavesniceBylaAktivni = false;
 
         // === DOM elementy ===
         const operaceEl = document.getElementById('operace');
@@ -561,7 +559,7 @@
             vysledekEl.style.visibility = 'visible';
         }
 
-        // === Jádro řešení: udržení klávesnice ===
+        // === Udržení klávesnice ===
         function aktivujPole() {
             odpovedEl.readOnly = true;
             odpovedEl.focus();
@@ -588,12 +586,9 @@
                 e.stopPropagation();
             }
 
-            klavesniceBylaAktivni = (document.activeElement === odpovedEl);
-
             odpovedEl.classList.remove('zelene', 'cervene');
 
             if (!zobrazitVysledek) {
-                // === START ===
                 const p = vygenerujPriklad();
                 if (!p) {
                     tlacitkoEl.textContent = 'START';
@@ -611,7 +606,6 @@
                     aktivujPole();
                 }, 100);
             } else {
-                // === VÝSLEDEK ===
                 const uziv = odpovedEl.value;
                 const norm = normalizuj(uziv);
 
@@ -644,21 +638,17 @@
             return false;
         }
 
-        // === Události na tlačítku ===
-
-        // Touchstart – pro mobil
+        // === Event listenery ===
         tlacitkoEl.addEventListener('touchstart', function(e) {
             e.preventDefault();
             handleTlacitko(e);
         }, { passive: false });
 
-        // Click – pro desktop
         tlacitkoEl.addEventListener('click', function(e) {
             if (e.pointerType === 'touch') return;
             handleTlacitko(e);
         });
 
-        // Enter na tlačítku
         tlacitkoEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -666,7 +656,6 @@
             }
         });
 
-        // Enter ve vstupním poli
         odpovedEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -674,7 +663,6 @@
             }
         });
 
-        // Když pole ztratí fokus
         odpovedEl.addEventListener('blur', function() {
             if (zobrazitVysledek) {
                 setTimeout(function() {
@@ -685,7 +673,6 @@
             }
         });
 
-        // Pro selecty
         [operaceEl, cislice1El, cislice2El].forEach(function(el) {
             el.addEventListener('change', function() {
                 if (zobrazitVysledek) {
@@ -700,7 +687,6 @@
             });
         });
 
-        // Přepínač pozadí - VRÁTÍ FOKUS DO POLE
         pozadiToggleEl.addEventListener('change', function() {
             if (this.checked) {
                 document.body.classList.add('sedy-rezim');
@@ -710,10 +696,6 @@
                 pozadiTextEl.textContent = 'světlé';
             }
             ulozNastaveni();
-            // Vrátit fokus do pole pro výsledek
-            setTimeout(function() {
-                odpovedEl.focus();
-            }, 100);
         });
 
         // === Inicializace ===
