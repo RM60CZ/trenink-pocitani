@@ -94,29 +94,32 @@
             width: 60px;
         }
 
-        /* Přepínač pozadí - upraveno */
-        .toggle-container {
+        /* Přepínač pozadí - konečné rozložení */
+        .pozadi-group {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .toggle-container .label-top {
-            margin-bottom: 0;
+        .pozadi-top {
+            font-weight: bold;
+            color: #cccccc;
             line-height: 1.2;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
-        .toggle-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
+        .pozadi-bottom {
+            font-weight: bold;
+            color: #cccccc;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
         .toggle-label {
             display: flex;
             align-items: center;
-            gap: 6px;
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
@@ -154,15 +157,6 @@
 
         .toggle-label input:checked + .toggle-switch::after {
             transform: translateX(20px);
-        }
-
-        .toggle-text {
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #cccccc;
-            text-align: center;
-            transition: color 0.3s ease;
-            min-height: 1.2em;
         }
 
         #tlacitko {
@@ -280,7 +274,9 @@
 
         body.sedy-rezim label,
         body.sedy-rezim .label-top,
-        body.sedy-rezim .label-bottom {
+        body.sedy-rezim .label-bottom,
+        body.sedy-rezim .pozadi-top,
+        body.sedy-rezim .pozadi-bottom {
             color: #555555;
         }
 
@@ -292,10 +288,6 @@
 
         body.sedy-rezim .toggle-switch {
             background: #888888;
-        }
-
-        body.sedy-rezim .toggle-text {
-            color: #555555;
         }
 
         body.sedy-rezim .example,
@@ -372,15 +364,13 @@
                 <select id="cislice2"></select>
             </div>
 
-            <div class="toggle-container">
-                <span class="label-top">Pozadí</span>
-                <div class="toggle-wrapper">
-                    <label class="toggle-label" for="pozadi-toggle">
-                        <input type="checkbox" id="pozadi-toggle" />
-                        <span class="toggle-switch"></span>
-                    </label>
-                    <span class="toggle-text" id="pozadi-text">světlé</span>
-                </div>
+            <div class="pozadi-group">
+                <span class="pozadi-top">Pozadí</span>
+                <span class="pozadi-bottom" id="pozadi-text">světlé</span>
+                <label class="toggle-label" for="pozadi-toggle">
+                    <input type="checkbox" id="pozadi-toggle" />
+                    <span class="toggle-switch"></span>
+                </label>
             </div>
         </div>
 
@@ -708,7 +698,7 @@
             });
         });
 
-        // Přepínač pozadí - upraveno pro dynamický text
+        // Přepínač pozadí
         pozadiToggleEl.addEventListener('change', function() {
             if (this.checked) {
                 document.body.classList.add('sedy-rezim');
