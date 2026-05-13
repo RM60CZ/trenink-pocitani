@@ -45,7 +45,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: flex-end;
+            align-items: flex-start;
             gap: 10px;
         }
 
@@ -94,11 +94,12 @@
             width: 60px;
         }
 
-        /* Přepínač pozadí - upravené rozložení */
+        /* Přepínač pozadí */
         .pozadi-group {
             display: flex;
             flex-direction: column;
             align-items: center;
+            align-self: flex-start;
         }
 
         .pozadi-top {
@@ -106,7 +107,6 @@
             color: #cccccc;
             line-height: 1.2;
             font-size: 0.85rem;
-            margin-bottom: 0;
             transition: color 0.3s ease;
         }
 
@@ -115,7 +115,7 @@
             color: #cccccc;
             font-size: 0.85rem;
             line-height: 1.2;
-            margin-bottom: 0;
+            margin-bottom: 4px;
             transition: color 0.3s ease;
         }
 
@@ -654,11 +654,11 @@
 
         // Click – pro desktop
         tlacitkoEl.addEventListener('click', function(e) {
-            if (e.pointerType === 'touch') return; // touch už odbavil touchstart
+            if (e.pointerType === 'touch') return;
             handleTlacitko(e);
         });
 
-        // Enter na tlačítku (když má fokus)
+        // Enter na tlačítku
         tlacitkoEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -674,7 +674,7 @@
             }
         });
 
-        // Když pole ztratí fokus nečekaně
+        // Když pole ztratí fokus
         odpovedEl.addEventListener('blur', function() {
             if (zobrazitVysledek) {
                 setTimeout(function() {
@@ -685,7 +685,7 @@
             }
         });
 
-        // Pro selecty – po změně vrátit fokus a uložit nastavení
+        // Pro selecty
         [operaceEl, cislice1El, cislice2El].forEach(function(el) {
             el.addEventListener('change', function() {
                 if (zobrazitVysledek) {
@@ -715,19 +715,15 @@
         // === Inicializace ===
         naplnSelecty();
         
-        // Načtení uložených nastavení
         const nacteno = nactiNastaveni();
         
-        // Pokud nic nebylo uloženo, nastavíme výchozí hodnoty
         if (!nacteno) {
             operaceEl.value = '+';
             cislice1El.value = '2';
             cislice2El.value = '1';
-            // Výchozí text pro tmavý režim
             pozadiTextEl.textContent = 'světlé';
         }
 
-        // Ihned po načtení focus na vstup
         setTimeout(function() {
             odpovedEl.focus();
         }, 100);
