@@ -18,6 +18,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            transition: background-color 0.3s ease;
         }
 
         .container {
@@ -28,6 +29,7 @@
             width: 95%;
             max-width: 500px;
             text-align: center;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
 
         h1 {
@@ -35,6 +37,7 @@
             margin-top: 0;
             margin-bottom: 12px;
             font-size: 1.8rem;
+            transition: color 0.3s ease;
         }
 
         .controls {
@@ -56,6 +59,7 @@
             font-weight: bold;
             margin-bottom: 4px;
             color: #cccccc;
+            transition: color 0.3s ease;
         }
 
         .label-top {
@@ -63,6 +67,7 @@
             color: #cccccc;
             line-height: 1.2;
             font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
         .label-bottom {
@@ -70,6 +75,7 @@
             color: #cccccc;
             margin-bottom: 4px;
             font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
         select {
@@ -80,10 +86,71 @@
             background: #1a1a1a;
             color: #ffffff;
             width: 55px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
         }
 
         #operace {
             width: 60px;
+        }
+
+        /* Přepínač pozadí */
+        .toggle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #333333;
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-label input:checked + .toggle-switch {
+            background: #3498db;
+        }
+
+        .toggle-label input:checked + .toggle-switch::after {
+            transform: translateX(20px);
+        }
+
+        .toggle-text {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #cccccc;
+            min-width: 35px;
+            transition: color 0.3s ease;
         }
 
         #tlacitko {
@@ -130,6 +197,7 @@
             white-space: pre;
             text-align: right;
             color: #ffffff;
+            transition: color 0.3s ease;
         }
 
         .cara {
@@ -184,6 +252,71 @@
             font-size: 0.9rem;
         }
 
+        /* === ŠEDÝ REŽIM === */
+        body.sedy-rezim {
+            background-color: #d4d4d4;
+        }
+
+        body.sedy-rezim .container {
+            background: #f5f5f5;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body.sedy-rezim h1 {
+            color: #2c3e50;
+        }
+
+        body.sedy-rezim label,
+        body.sedy-rezim .label-top,
+        body.sedy-rezim .label-bottom {
+            color: #555555;
+        }
+
+        body.sedy-rezim select {
+            background: #ffffff;
+            color: #333333;
+            border: 1px solid #cccccc;
+        }
+
+        body.sedy-rezim .toggle-switch {
+            background: #888888;
+        }
+
+        body.sedy-rezim .toggle-text {
+            color: #555555;
+        }
+
+        body.sedy-rezim .example,
+        body.sedy-rezim .cara,
+        body.sedy-rezim .result-line {
+            color: #333333;
+        }
+
+        body.sedy-rezim .cara {
+            color: #666666;
+        }
+
+        body.sedy-rezim .result-line {
+            color: #1b7a30;
+        }
+
+        body.sedy-rezim #odpoved {
+            background: #ffffff;
+            color: #333333;
+            border: 2px solid #cccccc;
+            caret-color: #333333;
+        }
+
+        body.sedy-rezim #odpoved.zelene {
+            background-color: #c8e6c9;
+            border-color: #4caf50;
+        }
+
+        body.sedy-rezim #odpoved.cervene {
+            background-color: #ffcdd2;
+            border-color: #ef5350;
+        }
+
         @media (max-width: 600px) {
             .example,
             .cara,
@@ -193,6 +326,9 @@
             #odpoved {
                 width: 150px;
                 font-size: 1.1rem;
+            }
+            .controls {
+                gap: 8px;
             }
         }
     </style>
@@ -222,6 +358,15 @@
                 <span class="label-top">Počet číslic</span>
                 <span class="label-bottom">2. čísla:</span>
                 <select id="cislice2"></select>
+            </div>
+
+            <div class="toggle-container">
+                <span class="label-top">Pozadí</span>
+                <label class="toggle-label" for="pozadi-toggle">
+                    <input type="checkbox" id="pozadi-toggle" />
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Šedé</span>
+                </label>
             </div>
         </div>
 
@@ -265,6 +410,58 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+        // === Ukládání a načítání nastavení ===
+        function ulozNastaveni() {
+            const nastaveni = {
+                operace: operaceEl.value,
+                cislice1: cislice1El.value,
+                cislice2: cislice2El.value,
+                sedyRezim: document.body.classList.contains('sedy-rezim')
+            };
+            try {
+                localStorage.setItem('treninkNastaveni', JSON.stringify(nastaveni));
+            } catch (e) {
+                console.warn('Nepodařilo se uložit nastavení:', e);
+            }
+        }
+
+        function nactiNastaveni() {
+            const ulozeno = localStorage.getItem('treninkNastaveni');
+            if (!ulozeno) return false;
+
+            try {
+                const nastaveni = JSON.parse(ulozeno);
+
+                // Nastavení operace
+                if (['+', '-', '*', '/'].includes(nastaveni.operace)) {
+                    operaceEl.value = nastaveni.operace;
+                }
+
+                // Nastavení počtu číslic (kontrola platných hodnot 1-9)
+                if (nastaveni.cislice1 >= 1 && nastaveni.cislice1 <= 9) {
+                    cislice1El.value = nastaveni.cislice1;
+                }
+                if (nastaveni.cislice2 >= 1 && nastaveni.cislice2 <= 9) {
+                    cislice2El.value = nastaveni.cislice2;
+                }
+
+                // Nastavení pozadí
+                const pozadiCheckbox = document.getElementById('pozadi-toggle');
+                if (pozadiCheckbox && nastaveni.sedyRezim) {
+                    pozadiCheckbox.checked = true;
+                    document.body.classList.add('sedy-rezim');
+                } else if (pozadiCheckbox) {
+                    pozadiCheckbox.checked = false;
+                    document.body.classList.remove('sedy-rezim');
+                }
+
+                return true;
+            } catch (e) {
+                console.warn('Nepodařilo se načíst nastavení:', e);
+                return false;
+            }
+        }
+
         // === Globální proměnné ===
         let aktualniPriklad = null;
         let zobrazitVysledek = false;
@@ -280,6 +477,7 @@
         const vysledekEl = document.getElementById('vysledek');
         const odpovedEl = document.getElementById('odpoved');
         const tlacitkoEl = document.getElementById('tlacitko');
+        const pozadiToggleEl = document.getElementById('pozadi-toggle');
 
         // === Naplnění selectů ===
         function naplnSelecty() {
@@ -287,8 +485,6 @@
                 cislice1El.innerHTML += `<option value="${i}">${i}</option>`;
                 cislice2El.innerHTML += `<option value="${i}">${i}</option>`;
             }
-            cislice1El.value = '2';
-            cislice2El.value = '1';
         }
 
         // === Generování příkladu ===
@@ -355,7 +551,7 @@
             vysledekEl.style.visibility = 'visible';
         }
 
-        // === Jadro řešení: udržení klávesnice ===
+        // === Jádro řešení: udržení klávesnice ===
         function aktivujPole() {
             odpovedEl.readOnly = true;
             odpovedEl.focus();
@@ -479,12 +675,13 @@
             }
         });
 
-        // Pro selecty – po změně vrátit fokus
+        // Pro selecty – po změně vrátit fokus a uložit nastavení
         [operaceEl, cislice1El, cislice2El].forEach(function(el) {
             el.addEventListener('change', function() {
                 if (zobrazitVysledek) {
                     setTimeout(vratKlavesnici, 200);
                 }
+                ulozNastaveni();
             });
             el.addEventListener('blur', function() {
                 if (zobrazitVysledek) {
@@ -493,9 +690,28 @@
             });
         });
 
+        // Přepínač pozadí
+        pozadiToggleEl.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('sedy-rezim');
+            } else {
+                document.body.classList.remove('sedy-rezim');
+            }
+            ulozNastaveni();
+        });
+
         // === Inicializace ===
         naplnSelecty();
-        operaceEl.value = '+';
+        
+        // Načtení uložených nastavení
+        const nacteno = nactiNastaveni();
+        
+        // Pokud nic nebylo uloženo, nastavíme výchozí hodnoty
+        if (!nacteno) {
+            operaceEl.value = '+';
+            cislice1El.value = '2';
+            cislice2El.value = '1';
+        }
 
         // Ihned po načtení focus na vstup
         setTimeout(function() {
