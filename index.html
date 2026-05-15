@@ -408,7 +408,7 @@
             const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-            caraEl.textContent = '─'.repeat(max);
+            //caraEl.textContent = '─'.repeat(max);
             caraEl.style.opacity = '0';
         }
 
