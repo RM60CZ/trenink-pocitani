@@ -22,12 +22,8 @@
         }
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         .zelene {
             background-color: #15803d !important;
             border-color: #22c55e !important;
@@ -61,29 +57,17 @@
             animation: pulse-blue 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse-blue {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
-            }
-            50% {
-                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
-            }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45); }
+            50% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
         }
         .btn-glow-emerald {
             animation: glow-emerald 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes glow-emerald {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
-            }
-            50% {
-                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-            }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
         }
-        #tlacitko {
-            position: relative;
-        }
+        #tlacitko { position: relative; }
         #tlacitko.state-start::before {
             content: '▶';
             display: inline-block;
@@ -101,63 +85,32 @@
             animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
         }
         @keyframes shake {
-            10%,
-            90% {
-                transform: translate3d(-1px, 0, 0);
-            }
-            20%,
-            80% {
-                transform: translate3d(2px, 0, 0);
-            }
-            30%,
-            50%,
-            70% {
-                transform: translate3d(-3px, 0, 0);
-            }
-            40%,
-            60% {
-                transform: translate3d(3px, 0, 0);
-            }
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+            40%, 60% { transform: translate3d(3px, 0, 0); }
         }
         .slide-up {
             animation: slideUp 0.3s ease-out forwards;
         }
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(8px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .fade-in {
             animation: fadeIn 0.3s ease-out forwards;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(3px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .pop {
             animation: pop 0.2s ease-out;
         }
         @keyframes pop {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         .settings-panel {
             max-height: 150px;
@@ -172,26 +125,17 @@
             margin-bottom: 0 !important;
             pointer-events: none;
         }
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
         @media (prefers-reduced-motion: reduce) {
-            .shake,
-            .pop,
-            .slide-up,
-            .fade-in {
-                animation: none !important;
-            }
-            #tlacitko.btn-pulse,
-            #tlacitko.btn-glow-emerald {
-                animation: none !important;
-            }
+            .shake, .pop, .slide-up, .fade-in { animation: none !important; }
+            #tlacitko.btn-pulse, #tlacitko.btn-glow-emerald { animation: none !important; }
         }
 
+        /* Fixed score bar */
         .score-bar {
             position: sticky;
             top: 0;
@@ -199,17 +143,11 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-
-        .history-item-hidden {
-            display: none;
-        }
-        .history-expanded .history-item-hidden {
-            display: block;
-        }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 font-sans">
 
+    <!-- App Container - max height 100dvh with flex column -->
     <div class="w-full max-w-md mx-auto flex flex-col min-h-[100dvh]">
 
         <!-- Fixed Score Bar -->
@@ -294,8 +232,9 @@
                                 <select id="cislice2" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-xs"></select>
                             </div>
                         </div>
+                        <!-- Division info -->
                         <div id="divisionInfo" class="hidden mt-2 text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
-                            Dělení zobrazí max. 4 des. místa. Odpověď na 2-4 des. místa je uznána.
+                            Dělení zobrazí přesně 4 desetinná místa. Odpověď na 3–4 des. místa je uznána.
                         </div>
                     </div>
 
@@ -330,23 +269,20 @@
                 </div>
             </div>
 
-            <!-- History -->
+            <!-- History - compact -->
             <div id="historyContainer" class="px-1 opacity-0 transition-opacity duration-500 select-none" aria-live="polite">
-                <div class="flex items-center justify-between mb-1.5">
-                    <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Historie</div>
-                    <button id="historyToggle" class="hidden text-[9px] font-bold text-blue-500 hover:text-blue-400 transition-colors uppercase tracking-wider">
-                        Zobrazit vše
-                    </button>
-                </div>
+                <div class="text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-1.5">Historie</div>
                 <div id="historyList" class="flex flex-wrap gap-1.5">
                     <div id="historyEmpty" class="text-[11px] text-slate-400 dark:text-slate-500 italic">Zatím jste nevyřešil(a) žádný příklad</div>
                 </div>
             </div>
 
+            <!-- Bottom spacer for mobile -->
             <div class="h-4"></div>
         </div>
     </div>
 
+    <!-- ═══════ ORIGINAL LOGIC ═══════ -->
     <script>
         let isProcessing = false;
 
@@ -354,7 +290,7 @@
             if (typeof x === 'bigint') return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             if (typeof x !== 'number') return String(x);
             if (Number.isInteger(x)) return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
+            // For non-integers, format with spaces in integer part only
             const [cela, des] = x.toString().split('.');
             const celaFmt = cela.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             return des ? `${celaFmt}.${des}` : celaFmt;
@@ -383,6 +319,7 @@
         const tlacitkoEl = document.getElementById('tlacitko');
         const divisionInfo = document.getElementById('divisionInfo');
 
+        // Show division info when division is selected
         operaceEl.addEventListener('change', () => {
             aktualizujCislici2();
             chybaEl.textContent = '';
@@ -420,17 +357,14 @@
             aktualizujCislici2();
         });
 
-        function zkratNaMax4Desetinna(cislo) {
+        // ── Division helper: truncate to 4 decimal places (no rounding) ──
+        function zkratNa4Desetinna(cislo) {
+            // Convert to string, split, truncate decimal part to 4 places
             const str = cislo.toString();
             const [cela, des] = str.split('.');
             if (!des) return cela;
-
-            // Remove trailing zeros and limit to 4 decimal places
-            let desOcistena = des.replace(/0+$/, '');
-            if (desOcistena.length > 4) {
-                desOcistena = desOcistena.substring(0, 4);
-            }
-            return desOcistena ? `${cela}.${desOcistena}` : cela;
+            const desZkracena = des.substring(0, 4);
+            return desZkracena ? `${cela}.${desZkracena}` : cela;
         }
 
         function vygenerujPriklad() {
@@ -465,7 +399,7 @@
                 vysledekZobrazeny = vysledek;
             } else if (op === '/') {
                 vysledek = a / b;
-                vysledekZobrazeny = zkratNaMax4Desetinna(vysledek);
+                vysledekZobrazeny = zkratNa4Desetinna(vysledek);
             }
             return { a, b, op, vysledek, vysledekZobrazeny };
         }
@@ -512,35 +446,41 @@
 
         odpovedEl.addEventListener('input', updateBtnDisable);
 
+        // ── Flexible division answer checking ──
         function zkontrolujOdpoved(uzivatelskaOdpoved, priklad) {
             const norm = normalizuj(uzivatelskaOdpoved);
-            if (norm === '') return null; // Empty input - return null to indicate no attempt
-
+            if (norm === '') return false;
+            
             if (priklad.op === '/') {
+                // For division: allow 3-4 decimal places, compare with truncated values
                 const userNum = parseFloat(norm);
                 if (isNaN(userNum)) return false;
-
-                // Get decimal places count in user input
+                
+                // Get the true result truncated to 4 decimal places
+                const trueTruncated = zkratNa4Desetinna(priklad.vysledek);
+                const trueNum = parseFloat(trueTruncated);
+                
+                // Convert user input to string and truncate to 4 decimal places (pad if needed)
                 const userStr = norm;
-                const [_, userDes = ''] = userStr.split('.');
+                const [userCela, userDes = ''] = userStr.split('.');
+                const userDesTruncated = userDes.substring(0, 4);
+                
+                // Compare by truncating both to 4 decimal places
+                const userNumTruncated = parseFloat(userDesTruncated ? `${userCela}.${userDesTruncated}` : userCela);
+                
+                // Also check: if user entered only 3 decimals, check if truncated 3-dec matches true 3-dec
                 const userDecimals = userDes.length;
-
-                // Allow 2-4 decimal places
-                if (userDecimals < 2 && userDes.length > 1) {
-                    // If user has decimals but less than 2, still accept
+                if (userDecimals >= 3 && userDecimals <= 4) {
+                    // Truncate true result to same number of decimals as user input
+                    const trueDesTruncated = zkratNa4Desetinna(priklad.vysledek).split('.')[1] || '';
+                    const trueDesToMatch = trueDesTruncated.substring(0, userDecimals);
+                    const trueToMatch = parseFloat(`${zkratNa4Desetinna(priklad.vysledek).split('.')[0]}.${trueDesToMatch}`);
+                    const userToMatch = userNumTruncated;
+                    
+                    return Math.abs(userToMatch - trueToMatch) < 1e-9;
                 }
-
-                // Truncate true result to match user's decimal places (max 4)
-                const trueStr = zkratNaMax4Desetinna(priklad.vysledek);
-                const [trueCela, trueDes = ''] = trueStr.split('.');
-                const trueDesToMatch = trueDes.substring(0, Math.min(userDecimals, 4));
-                const trueToMatch = parseFloat(trueDesToMatch ? `${trueCela}.${trueDesToMatch}` : trueCela);
-
-                // Also truncate user input to max 4 decimal places
-                const userDesToMatch = userDes.substring(0, 4);
-                const userToMatch = parseFloat(userDesToMatch ? `${userStr.split('.')[0]}.${userDesToMatch}` : userStr.split('.')[0]);
-
-                return Math.abs(userToMatch - trueToMatch) < 1e-9;
+                
+                return Math.abs(userNumTruncated - trueNum) < 1e-9;
             } else if (typeof priklad.vysledek === 'bigint') {
                 try {
                     return BigInt(norm) === priklad.vysledek;
@@ -564,7 +504,6 @@
             odpovedEl.classList.remove('zelene', 'cervene');
 
             if (!zobrazitVysledek) {
-                // Generate new problem
                 const p = vygenerujPriklad();
                 if (!p) {
                     isProcessing = false;
@@ -575,10 +514,7 @@
                 odpovedEl.value = '';
                 zobrazitVysledek = true;
                 aktualizujTextTlacitka();
-
-                // Collapse history when starting new calculation
-                collapseHistory();
-
+                // Show division info when entering answer
                 if (p.op === '/') {
                     divisionInfo.classList.remove('hidden');
                 } else {
@@ -589,25 +525,13 @@
                     isProcessing = false;
                 }, 50);
             } else {
-                // Check answer
                 const uziv = odpovedEl.value;
-                const vysledekKontroly = zkontrolujOdpoved(uziv, aktualniPriklad);
-
-                if (vysledekKontroly === null) {
-                    // Empty input - show result but don't record
-                    zobrazVysledek(aktualniPriklad);
-                    zobrazitVysledek = false;
-                    aktualizujTextTlacitka();
-                    divisionInfo.classList.add('hidden');
-                    setTimeout(() => isProcessing = false, 150);
-                    return;
-                }
-
-                const spravne = vysledekKontroly;
+                const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                 odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
                 zobrazVysledek(aktualniPriklad);
                 zobrazitVysledek = false;
                 aktualizujTextTlacitka();
+                // Hide division info after answer
                 divisionInfo.classList.add('hidden');
                 setTimeout(() => isProcessing = false, 150);
             }
@@ -621,12 +545,6 @@
             if (e.key === 'Enter') handleTlacitko(e);
         });
 
-        // Remove disabled state for button when checking empty
-        function updateBtnDisable() {
-            // Don't disable for empty - allow checking with empty input
-            tlacitkoEl.disabled = false;
-        }
-
         naplnSelecty();
         aktualizujTextTlacitka();
         updateBtnDisable();
@@ -636,7 +554,7 @@
     <!-- ═══════ UI ENHANCEMENT LAYER ═══════ -->
     <script>
         (function() {
-            const STORAGE_KEY = 'matika_trenink_v3';
+            const STORAGE_KEY = 'matika_trenink_v2';
 
             function getTodayString() {
                 const now = new Date();
@@ -689,11 +607,7 @@
                 } catch (e) {}
             }
 
-            let correct = 0,
-                wrong = 0,
-                streak = 0,
-                history = [];
-            let historyExpanded = false;
+            let correct = 0, wrong = 0, streak = 0, history = [];
             const savedState = loadState();
             if (savedState) {
                 correct = savedState.correct || 0;
@@ -718,7 +632,6 @@
             const historyContainer = document.getElementById('historyContainer');
             const historyList = document.getElementById('historyList');
             const historyEmpty = document.getElementById('historyEmpty');
-            const historyToggle = document.getElementById('historyToggle');
             const settingsToggle = document.getElementById('settingsToggle');
             const settingsPanel = document.getElementById('settingsPanel');
             const chybaEl = document.getElementById('chyba');
@@ -731,27 +644,13 @@
             scoreWrong.textContent = wrong;
             streakCount.textContent = streak;
 
-            const iconCheck =
-                `<svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
-            const iconCross =
-                `<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
-
-            // History toggle button
-            historyToggle.addEventListener('click', () => {
-                historyExpanded = !historyExpanded;
-                renderHistory();
-            });
-
-            // Function to collapse history (called when starting new calculation)
-            window.collapseHistory = function() {
-                historyExpanded = false;
-                renderHistory();
-            };
+            const iconCheck = `<svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            const iconCross = `<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
             settingsToggle.addEventListener('click', () => {
                 settingsPanel.classList.toggle('collapsed');
-                if (!settingsPanel.classList.contains('collapsed') && document.getElementById('operace').value ===
-                    '/') {
+                // Show division info when panel is opened and division is selected
+                if (!settingsPanel.classList.contains('collapsed') && document.getElementById('operace').value === '/') {
                     divisionInfo.classList.remove('hidden');
                 } else if (settingsPanel.classList.contains('collapsed')) {
                     divisionInfo.classList.add('hidden');
@@ -788,84 +687,45 @@
 
             let processedZelene = false;
             let processedCervene = false;
-            let lastAnswerWasEmpty = false;
 
             const inputObserver = new MutationObserver((mutations) => {
                 mutations.forEach((m) => {
                     if (m.type === 'attributes' && m.attributeName === 'class') {
                         const cls = input.classList;
-
-                        // Check if this was an empty answer (no class added)
-                        if (!cls.contains('zelene') && !cls.contains('cervene') &&
-                            typeof aktualniPriklad !== 'undefined' && aktualniPriklad &&
-                            !zobrazitVysledek && input.value.trim() === '') {
-                            // Empty answer - show result but don't record
-                            lastAnswerWasEmpty = true;
-                            return;
-                        }
-
                         if (cls.contains('zelene')) {
                             if (processedZelene) return;
                             processedZelene = true;
-                            if (!lastAnswerWasEmpty) {
-                                correct++;
-                                streak++;
-                                updateScores();
-                                addHistory(true);
-                                saveState();
-                            }
+                            correct++;
+                            streak++;
                             inputIcon.innerHTML = iconCheck;
                             inputIcon.style.opacity = '1';
                             inputIcon.style.transform = 'translateY(-50%) scale(1)';
-                            lastAnswerWasEmpty = false;
+                            updateScores();
+                            addHistory(true);
+                            saveState();
                         } else if (cls.contains('cervene')) {
                             if (processedCervene) return;
                             processedCervene = true;
-                            if (!lastAnswerWasEmpty) {
-                                wrong++;
-                                streak = 0;
-                                updateScores();
-                                addHistory(false);
-                                saveState();
-                            }
+                            wrong++;
+                            streak = 0;
                             inputIcon.innerHTML = iconCross;
                             inputIcon.style.opacity = '1';
                             inputIcon.style.transform = 'translateY(-50%) scale(1)';
                             input.classList.add('shake');
                             setTimeout(() => input.classList.remove('shake'), 500);
-                            lastAnswerWasEmpty = false;
+                            updateScores();
+                            addHistory(false);
+                            saveState();
                         } else {
                             processedZelene = false;
                             processedCervene = false;
                             inputIcon.style.opacity = '0';
                             inputIcon.style.transform = 'translateY(-50%) scale(0.75)';
-                            lastAnswerWasEmpty = false;
                         }
                     }
                 });
             });
             inputObserver.observe(input, { attributes: true, attributeFilter: ['class'] });
-
-            // Override the handleTlacitko to detect empty answers
-            const originalHandleTlacitko = handleTlacitko;
-            window.handleTlacitko = function(e) {
-                const wasEmpty = input.value.trim() === '' && zobrazitVysledek;
-                if (wasEmpty) {
-                    lastAnswerWasEmpty = true;
-                    // Show result
-                    if (aktualniPriklad) {
-                        zobrazVysledek(aktualniPriklad);
-                        zobrazitVysledek = false;
-                        aktualizujTextTlacitka();
-                        divisionInfo.classList.add('hidden');
-                    }
-                    isProcessing = false;
-                    // Reset flag after a delay
-                    setTimeout(() => { lastAnswerWasEmpty = false; }, 200);
-                    return;
-                }
-                originalHandleTlacitko(e);
-            };
 
             function updateScores() {
                 scoreCorrect.textContent = correct;
@@ -887,7 +747,7 @@
                 }
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
-                // Keep all history for the day (no limit)
+                if (history.length > 5) history.pop();
                 renderHistory();
             }
 
@@ -895,41 +755,19 @@
                 if (history.length === 0) {
                     historyEmpty.style.display = 'block';
                     historyContainer.style.opacity = '0';
-                    historyToggle.classList.add('hidden');
                     historyList.querySelectorAll('.history-item').forEach(el => el.remove());
                     return;
                 }
-
                 historyEmpty.style.display = 'none';
                 historyContainer.style.opacity = '1';
                 historyList.querySelectorAll('.history-item').forEach(el => el.remove());
-
-                // Determine how many items to show
-                const showCount = historyExpanded ? history.length : Math.min(2, history.length);
-
-                // Show/hide toggle button
-                if (history.length > 2) {
-                    historyToggle.classList.remove('hidden');
-                    historyToggle.textContent = historyExpanded ? 'Skrýt' : 'Zobrazit vše';
-                } else {
-                    historyToggle.classList.add('hidden');
-                }
-
-                // Render items
                 history.forEach((h, i) => {
                     const item = document.createElement('div');
-                    let itemClass = `history-item slide-up px-2.5 py-1 rounded-md text-[11px] font-mono font-bold border ${
+                    item.className = `history-item slide-up px-2.5 py-1 rounded-md text-[11px] font-mono font-bold border ${
                         h.correct
                             ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
                             : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
                     }`;
-
-                    // Hide items beyond the first 2 when collapsed
-                    if (i >= 2 && !historyExpanded) {
-                        itemClass += ' history-item-hidden';
-                    }
-
-                    item.className = itemClass;
                     item.style.animationDelay = `${i * 50}ms`;
                     item.innerHTML = `${h.text} ${h.correct ? '✓' : '✗'}`;
                     historyList.appendChild(item);
@@ -963,14 +801,17 @@
             });
             vysledekObserver.observe(vysledekEl, { childList: true });
 
+            // ── Division operator change observer ──
             const operaceObserver = document.getElementById('operace');
-            operaceObserver.addEventListener('change', () => {
+            const origChangeHandler = operaceObserver.onchange;
+            const divisionObserver = new MutationObserver(() => {
                 if (operaceObserver.value === '/' && !settingsPanel.classList.contains('collapsed')) {
                     divisionInfo.classList.remove('hidden');
                 } else {
                     divisionInfo.classList.add('hidden');
                 }
             });
+            divisionObserver.observe(operaceObserver, { attributes: true, attributeFilter: ['value'] });
         })();
     </script>
 </body>
