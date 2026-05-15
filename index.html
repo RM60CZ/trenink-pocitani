@@ -242,11 +242,14 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 overflow-hidden border border-slate-200 dark:border-slate-800">
             <div class="p-6 md:p-8">
 
-                <!-- Header with Settings Toggle -->
+                <!-- Header with Date and Settings Toggle -->
                 <div class="flex items-center justify-between mb-6">
-                    <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-white uppercase">
-                        Trénink počítání
-                    </h1>
+                    <div class="flex flex-col">
+                        <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-white uppercase">
+                            Trénink počítání
+                        </h1>
+                        <span id="currentDate" class="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5"></span>
+                    </div>
                     <button id="settingsToggle" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" title="Nastavení" aria-label="Nastavení operace a cifer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -531,15 +534,88 @@
     </script>
 
     <!-- ═══════════════════════════════════════════════════════
-         UI ENHANCEMENT LAYER — safe observers, no freeze risk
-         (adapted to new button text patterns)
+         UI ENHANCEMENT LAYER — with localStorage persistence
+         and daily history reset
          ═══════════════════════════════════════════════════════ -->
     <script>
         (function() {
+            // ── Date and Storage Helpers ──
+            const STORAGE_KEY = 'matika_trenink';
+
+            function getTodayString() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function formatDateCzech(dateStr) {
+                const [year, month, day] = dateStr.split('-');
+                const months = [
+                    'ledna', 'února', 'března', 'dubna', 'května', 'června',
+                    'července', 'srpna', 'září', 'října', 'listopadu', 'prosince'
+                ];
+                const dayNum = parseInt(day, 10);
+                const monthIndex = parseInt(month, 10) - 1;
+                const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+                const date = new Date(year, monthIndex, dayNum);
+                const weekday = weekdays[date.getDay()];
+                return `${weekday} ${dayNum}. ${months[monthIndex]} ${year}`;
+            }
+
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return null;
+                    const state = JSON.parse(raw);
+                    const today = getTodayString();
+                    // If stored date is not today, reset
+                    if (state.date !== today) {
+                        localStorage.removeItem(STORAGE_KEY);
+                        return null;
+                    }
+                    return state;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function saveState() {
+                const state = {
+                    date: getTodayString(),
+                    correct: correct,
+                    wrong: wrong,
+                    streak: streak,
+                    history: history
+                };
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                } catch (e) {
+                    // Storage full or unavailable - silently fail
+                }
+            }
+
+            // ── Initialize State from Storage ──
             let correct = 0,
                 wrong = 0,
                 streak = 0,
                 history = [];
+
+            const savedState = loadState();
+            if (savedState) {
+                correct = savedState.correct || 0;
+                wrong = savedState.wrong || 0;
+                streak = savedState.streak || 0;
+                history = savedState.history || [];
+            }
+
+            // Display current date
+            const today = getTodayString();
+            const currentDateEl = document.getElementById('currentDate');
+            if (currentDateEl) {
+                currentDateEl.textContent = formatDateCzech(today);
+            }
 
             const btn = document.getElementById('tlacitko');
             const input = document.getElementById('odpoved');
@@ -557,6 +633,11 @@
             const prikladEl = document.getElementById('priklad');
             const caraEl = document.getElementById('cara');
             const vysledekEl = document.getElementById('vysledek');
+
+            // Initialize display with loaded values
+            scoreCorrect.textContent = correct;
+            scoreWrong.textContent = wrong;
+            streakCount.textContent = streak;
 
             const iconCheck =
                 `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
@@ -618,6 +699,7 @@
                             inputIcon.style.transform = 'translateY(-50%) scale(1)';
                             updateScores();
                             addHistory(true);
+                            saveState(); // Persist after correct answer
                         } else if (cls.contains('cervene')) {
                             if (processedCervene) return;
                             processedCervene = true;
@@ -630,6 +712,7 @@
                             setTimeout(() => input.classList.remove('shake'), 500);
                             updateScores();
                             addHistory(false);
+                            saveState(); // Persist after wrong answer
                         } else {
                             processedZelene = false;
                             processedCervene = false;
@@ -688,6 +771,9 @@
                     historyList.appendChild(item);
                 });
             }
+
+            // Initial history render (loads from storage if any)
+            renderHistory();
 
             // ── Problem reveal animation ──
             const problemObserver = new MutationObserver(() => {
