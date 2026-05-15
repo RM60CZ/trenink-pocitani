@@ -525,15 +525,29 @@
                     isProcessing = false;
                 }, 50);
             } else {
-                const uziv = odpovedEl.value;
-                const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
-                odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                zobrazVysledek(aktualniPriklad);
-                zobrazitVysledek = false;
-                aktualizujTextTlacitka();
-                // Hide division info after answer
-                divisionInfo.classList.add('hidden');
-                setTimeout(() => isProcessing = false, 150);
+                const uziv = odpovedEl.value.trim();
+                
+                if (uziv === '') {
+                    // Prázdné pole – jen zobrazit výsledek, nic nezapisovat
+                    zobrazVysledek(aktualniPriklad);
+                    zobrazitVysledek = false;
+                    aktualizujTextTlacitka();
+                    divisionInfo.classList.add('hidden');
+                    // Focus zpět do pole
+                    setTimeout(() => {
+                        odpovedEl.focus();
+                        isProcessing = false;
+                    }, 50);
+                } else {
+                    // Vyplněné pole – normální kontrola
+                    const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
+                    odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                    zobrazVysledek(aktualniPriklad);
+                    zobrazitVysledek = false;
+                    aktualizujTextTlacitka();
+                    divisionInfo.classList.add('hidden');
+                    setTimeout(() => isProcessing = false, 150);
+                }
             }
         }
 
