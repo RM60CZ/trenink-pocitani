@@ -22,7 +22,6 @@
         }
     </script>
     <style>
-        /* ─── Original overrides (preserved exactly) ─── */
         .zelene {
             background-color: #15803d !important;
             border-color: #22c55e !important;
@@ -37,15 +36,12 @@
             -webkit-appearance: none;
             border-radius: 0.75rem;
         }
-
-        /* ─── New UX polish ─── */
         .math-text {
             white-space: pre;
             line-height: 1.25;
             display: block;
             font-variant-numeric: tabular-nums;
         }
-
         .worksheet-bg {
             background-color: #f8fafc;
             background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
@@ -55,35 +51,21 @@
             background-color: rgba(30, 41, 59, 0.4);
             background-image: radial-gradient(circle, #334155 1px, transparent 1px);
         }
-
         .btn-pulse {
             animation: pulse-blue 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse-blue {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
-            }
-            50% {
-                box-shadow: 0 0 0 14px rgba(37, 99, 235, 0);
-            }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45); }
+            50% { box-shadow: 0 0 0 14px rgba(37, 99, 235, 0); }
         }
         .btn-glow-emerald {
             animation: glow-emerald 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes glow-emerald {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
-            }
-            50% {
-                box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
-            }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+            50% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
         }
-
-        #tlacitko {
-            position: relative;
-        }
+        #tlacitko { position: relative; }
         #tlacitko.state-start::before {
             content: '▶';
             display: inline-block;
@@ -97,70 +79,37 @@
             font-size: 0.9em;
             font-weight: 900;
         }
-
         .shake {
             animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
         }
         @keyframes shake {
-            10%,
-            90% {
-                transform: translate3d(-1px, 0, 0);
-            }
-            20%,
-            80% {
-                transform: translate3d(2px, 0, 0);
-            }
-            30%,
-            50%,
-            70% {
-                transform: translate3d(-4px, 0, 0);
-            }
-            40%,
-            60% {
-                transform: translate3d(4px, 0, 0);
-            }
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
         .slide-up {
             animation: slideUp 0.35s ease-out forwards;
         }
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px) scale(0.96);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(12px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .fade-in {
             animation: fadeIn 0.4s ease-out forwards;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(4px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .pop {
             animation: pop 0.25s ease-out;
         }
         @keyframes pop {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.25);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+            100% { transform: scale(1); }
         }
-
         .settings-panel {
             max-height: 200px;
             opacity: 1;
@@ -174,43 +123,27 @@
             margin-bottom: 0 !important;
             pointer-events: none;
         }
-
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-
-        /* ─── Reduced motion support ─── */
         @media (prefers-reduced-motion: reduce) {
-            .shake,
-            .pop,
-            .slide-up,
-            .fade-in {
-                animation: none !important;
-            }
-            #tlacitko.btn-pulse,
-            #tlacitko.btn-glow-emerald {
-                animation: none !important;
-            }
+            .shake, .pop, .slide-up, .fade-in { animation: none !important; }
+            #tlacitko.btn-pulse, #tlacitko.btn-glow-emerald { animation: none !important; }
+        }
+        .theme-toggle {
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        .theme-toggle:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 font-sans">
-
-    <!-- Theme Toggle -->
-    <button onclick="document.documentElement.classList.toggle('dark')"
-            class="fixed top-6 right-6 p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 hover:scale-110 transition-all z-50 group"
-            aria-label="Přepnout tmavý/světlý režim">
-        <svg class="dark:hidden w-6 h-6 text-slate-500 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-        <svg class="hidden dark:inline w-6 h-6 text-amber-400 group-hover:text-amber-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-    </button>
 
     <div class="w-full max-w-md">
 
@@ -242,15 +175,30 @@
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 overflow-hidden border border-slate-200 dark:border-slate-800">
             <div class="p-6 md:p-8">
 
-                <!-- Header with Date and Settings Toggle -->
-                <div class="flex items-center justify-between mb-6">
+                <!-- Header with Date, Theme Toggle and Settings Toggle -->
+                <div class="flex items-start justify-between mb-6">
                     <div class="flex flex-col">
                         <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-white uppercase">
                             Trénink počítání
                         </h1>
-                        <span id="currentDate" class="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5"></span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="currentDate" class="text-xs font-medium text-slate-400 dark:text-slate-500"></span>
+                            <!-- Theme Toggle - moved here under the date -->
+                            <button onclick="document.documentElement.classList.toggle('dark')"
+                                    class="theme-toggle p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                    aria-label="Přepnout tmavý/světlý režim">
+                                <!-- Slunce (světlý režim) -->
+                                <svg class="dark:hidden w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <!-- Měsíc (tmavý režim) -->
+                                <svg class="hidden dark:inline w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <button id="settingsToggle" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" title="Nastavení" aria-label="Nastavení operace a cifer">
+                    <button id="settingsToggle" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 mt-1" title="Nastavení" aria-label="Nastavení operace a cifer">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -281,14 +229,14 @@
                     </div>
                 </div>
 
-                <!-- Error container (always present, now with role alert) -->
+                <!-- Error container -->
                 <div id="chyba" class="text-red-500 text-[11px] font-bold text-center h-5 overflow-hidden mb-2" role="alert"></div>
 
                 <!-- Worksheet -->
                 <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 mb-6 worksheet-bg relative overflow-hidden min-h-[180px] flex flex-col justify-center">
                     <div class="absolute top-3 right-4 text-[10px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">Pracovní list</div>
                     <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
-                        <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-xl md:text-2xl tracking-tighter text-slate-700 dark:text-slate-200">Zvol nastavení přes ozubené kolečko a stiskni ▶ Začít</div>
+                        <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-xl md:text-2xl tracking-tighter text-slate-700 dark:text-slate-200">Zvolte nastavení přes ozubené kolečko a stiskněte ▶ Začít</div>
                         <div id="cara" class="math-text font-mono text-3xl md:text-4xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-1 opacity-0 transition-opacity duration-300"></div>
                         <div id="vysledek" class="math-text font-mono text-3xl md:text-4xl text-emerald-600 dark:text-emerald-400 font-bold mt-1 opacity-0 transition-opacity duration-300"></div>
                     </div>
@@ -300,8 +248,7 @@
                         <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
                                placeholder="Váš výsledek"
                                class="w-full p-4 pr-12 text-2xl text-center font-mono font-bold rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
-                        <div id="inputIcon" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none">
-                        </div>
+                        <div id="inputIcon" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none"></div>
                         <div id="enterHint" class="absolute right-0 -bottom-5 text-[10px] text-slate-400 font-medium opacity-0 transition-opacity duration-200 select-none">Stiskni Enter ↵</div>
                     </div>
 
@@ -313,19 +260,16 @@
             </div>
         </div>
 
-        <!-- History (with empty state) -->
+        <!-- History -->
         <div id="historyContainer" class="mt-4 px-2 opacity-0 transition-opacity duration-500 select-none" aria-live="polite">
             <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Historie</div>
             <div id="historyList" class="flex flex-wrap gap-2">
-                <div id="historyEmpty" class="text-xs text-slate-400 dark:text-slate-500 italic">Zatím jsi nevyřešil(a) žádný příklad</div>
+                <div id="historyEmpty" class="text-xs text-slate-400 dark:text-slate-500 italic">Zatím jste nevyřešil(a) žádný příklad</div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════
-         ORIGINAL LOGIC — ADAPTED with new button flow,
-         subtraction digit prevention, and empty-answer guard
-         ═══════════════════════════════════════════════════════ -->
+    <!-- ═══════ ORIGINAL LOGIC ═══════ -->
     <script>
         let isProcessing = false;
 
@@ -360,7 +304,6 @@
         const odpovedEl = document.getElementById('odpoved');
         const tlacitkoEl = document.getElementById('tlacitko');
 
-        // ── Dynamic disabling for subtraction ──
         function aktualizujCislici2() {
             const op = operaceEl.value;
             const firstVal = parseInt(cislice1El.value);
@@ -369,7 +312,6 @@
                 const val = parseInt(options[i].value);
                 options[i].disabled = (op === '-' && val > firstVal);
             }
-            // If the currently selected value is now disabled, move it to the highest allowed
             if (parseInt(cislice2El.value) > firstVal && op === '-') {
                 cislice2El.value = firstVal;
             }
@@ -382,13 +324,12 @@
             }
             cislice1El.value = '2';
             cislice2El.value = '1';
-            aktualizujCislici2(); // initial enforcement
+            aktualizujCislici2();
         }
 
-        // Trigger on relevant changes
         operaceEl.addEventListener('change', () => {
             aktualizujCislici2();
-            chybaEl.textContent = ''; // clear any previous error
+            chybaEl.textContent = '';
         });
         cislice1El.addEventListener('change', () => {
             aktualizujCislici2();
@@ -400,7 +341,6 @@
             const n2 = parseInt(cislice2El.value);
             chybaEl.textContent = '';
 
-            // The UI now prevents impossible combos, but we leave a fallback check.
             if (op === '-' && n1 < n2) {
                 chybaEl.textContent = '❌ Při odčítání musí mít první číslo alespoň tolik cifer jako druhé.';
                 return null;
@@ -447,9 +387,7 @@
             odpovedEl.focus();
         }
 
-        // Disable the check button when input is empty and we're in "check" mode
         function updateBtnDisable() {
-            // Disable only when waiting for answer (zobrazitVysledek = true) and input empty
             const isEmpty = odpovedEl.value.trim() === '';
             tlacitkoEl.disabled = (zobrazitVysledek && isEmpty);
         }
@@ -478,7 +416,6 @@
             odpovedEl.classList.remove('zelene', 'cervene');
 
             if (!zobrazitVysledek) {
-                // Generate new problem
                 const p = vygenerujPriklad();
                 if (!p) {
                     isProcessing = false;
@@ -494,7 +431,6 @@
                     isProcessing = false;
                 }, 50);
             } else {
-                // Check answer
                 const uziv = odpovedEl.value;
                 const norm = normalizuj(uziv);
                 if (norm !== '') {
@@ -528,18 +464,14 @@
         });
 
         naplnSelecty();
-        aktualizujTextTlacitka(); // set initial button text
+        aktualizujTextTlacitka();
         updateBtnDisable();
         setTimeout(aktivujPole, 100);
     </script>
 
-    <!-- ═══════════════════════════════════════════════════════
-         UI ENHANCEMENT LAYER — with localStorage persistence
-         and daily history reset
-         ═══════════════════════════════════════════════════════ -->
+    <!-- ═══════ UI ENHANCEMENT LAYER ═══════ -->
     <script>
         (function() {
-            // ── Date and Storage Helpers ──
             const STORAGE_KEY = 'matika_trenink';
 
             function getTodayString() {
@@ -570,7 +502,6 @@
                     if (!raw) return null;
                     const state = JSON.parse(raw);
                     const today = getTodayString();
-                    // If stored date is not today, reset
                     if (state.date !== today) {
                         localStorage.removeItem(STORAGE_KEY);
                         return null;
@@ -591,17 +522,10 @@
                 };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-                } catch (e) {
-                    // Storage full or unavailable - silently fail
-                }
+                } catch (e) {}
             }
 
-            // ── Initialize State from Storage ──
-            let correct = 0,
-                wrong = 0,
-                streak = 0,
-                history = [];
-
+            let correct = 0, wrong = 0, streak = 0, history = [];
             const savedState = loadState();
             if (savedState) {
                 correct = savedState.correct || 0;
@@ -610,7 +534,6 @@
                 history = savedState.history || [];
             }
 
-            // Display current date
             const today = getTodayString();
             const currentDateEl = document.getElementById('currentDate');
             if (currentDateEl) {
@@ -634,22 +557,17 @@
             const caraEl = document.getElementById('cara');
             const vysledekEl = document.getElementById('vysledek');
 
-            // Initialize display with loaded values
             scoreCorrect.textContent = correct;
             scoreWrong.textContent = wrong;
             streakCount.textContent = streak;
 
-            const iconCheck =
-                `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
-            const iconCross =
-                `<svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+            const iconCheck = `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            const iconCross = `<svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
 
-            // Settings toggle
             settingsToggle.addEventListener('click', () => {
                 settingsPanel.classList.toggle('collapsed');
             });
 
-            // Auto-expand settings when error appears
             const chybaObserver = new MutationObserver(() => {
                 if (chybaEl.textContent.trim()) {
                     settingsPanel.classList.remove('collapsed');
@@ -657,7 +575,6 @@
             });
             chybaObserver.observe(chybaEl, { childList: true });
 
-            // Input hints
             input.addEventListener('focus', () => {
                 if (btn.textContent.trim() === 'ZKONTROLOVAT') {
                     enterHint.style.opacity = '1';
@@ -668,20 +585,17 @@
                 if (input.value.length > 0) enterHint.style.opacity = '0';
             });
 
-            // ── Button state observer (adapts to ZAČÍT / ZKONTROLOVAT / DALŠÍ PŘÍKLAD) ──
             const btnObserver = new MutationObserver(() => {
                 const text = btn.textContent.trim();
                 btn.classList.remove('state-start', 'state-result', 'btn-pulse', 'btn-glow-emerald');
                 if (text === 'ZKONTROLOVAT') {
                     btn.classList.add('state-result', 'btn-glow-emerald');
                 } else {
-                    // ZAČÍT or DALŠÍ PŘÍKLAD
                     btn.classList.add('state-start', 'btn-pulse');
                 }
             });
             btnObserver.observe(btn, { childList: true, characterData: true, subtree: true });
 
-            // ── Score & feedback observer ──
             let processedZelene = false;
             let processedCervene = false;
 
@@ -699,7 +613,7 @@
                             inputIcon.style.transform = 'translateY(-50%) scale(1)';
                             updateScores();
                             addHistory(true);
-                            saveState(); // Persist after correct answer
+                            saveState();
                         } else if (cls.contains('cervene')) {
                             if (processedCervene) return;
                             processedCervene = true;
@@ -712,7 +626,7 @@
                             setTimeout(() => input.classList.remove('shake'), 500);
                             updateScores();
                             addHistory(false);
-                            saveState(); // Persist after wrong answer
+                            saveState();
                         } else {
                             processedZelene = false;
                             processedCervene = false;
@@ -741,7 +655,7 @@
                 } else {
                     text = prikladEl.textContent.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
                 }
-                if (!text || text === 'Vyber nastavení a stiskni ▶') return;
+                if (!text || text === 'Vyber nastavení a stiskni ▶' || text === 'Zvolte nastavení přes ozubené kolečko a stiskněte ▶ Začít') return;
                 history.unshift({ text, correct: isCorrect });
                 if (history.length > 5) history.pop();
                 renderHistory();
@@ -749,19 +663,17 @@
 
             function renderHistory() {
                 if (history.length === 0) {
-                    historyEmpty.style.display = 'block'; // show empty message
-                    historyContainer.style.opacity = '0'; // keep container hidden
+                    historyEmpty.style.display = 'block';
+                    historyContainer.style.opacity = '0';
                     historyList.querySelectorAll('.history-item').forEach(el => el.remove());
                     return;
                 }
                 historyEmpty.style.display = 'none';
                 historyContainer.style.opacity = '1';
-                // Remove previous items except the empty message
                 historyList.querySelectorAll('.history-item').forEach(el => el.remove());
                 history.forEach((h, i) => {
                     const item = document.createElement('div');
-                    item.className =
-                        `history-item slide-up px-3 py-1.5 rounded-lg text-xs font-mono font-bold border ${
+                    item.className = `history-item slide-up px-3 py-1.5 rounded-lg text-xs font-mono font-bold border ${
                         h.correct
                             ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
                             : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
@@ -772,13 +684,11 @@
                 });
             }
 
-            // Initial history render (loads from storage if any)
             renderHistory();
 
-            // ── Problem reveal animation ──
             const problemObserver = new MutationObserver(() => {
                 const txt = prikladEl.textContent;
-                if (txt && txt !== 'Vyber nastavení a stiskni ▶') {
+                if (txt && txt !== 'Vyber nastavení a stiskni ▶' && txt !== 'Zvolte nastavení přes ozubené kolečko a stiskněte ▶ Začít') {
                     prikladEl.classList.remove('fade-in');
                     void prikladEl.offsetWidth;
                     prikladEl.classList.add('fade-in');
@@ -786,7 +696,6 @@
             });
             problemObserver.observe(prikladEl, { childList: true });
 
-            // ── Answer reveal animation ──
             const vysledekObserver = new MutationObserver(() => {
                 const isVisible = vysledekEl.style.visibility === 'visible';
                 const hasContent = vysledekEl.textContent.trim() !== '';
