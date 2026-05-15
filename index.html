@@ -242,11 +242,12 @@
                     <div id="chyba" class="text-red-500 text-[10px] font-bold text-center h-4 overflow-hidden mb-1" role="alert"></div>
 
                     <!-- Worksheet - compact -->
-                    <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl p-4 mb-3 worksheet-bg relative overflow-hidden min-h-[90px] flex flex-col justify-center">
+                    <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl p-4 mb-3 worksheet-bg relative overflow-hidden flex flex-col justify-center">
                         <div class="absolute top-2 right-3 text-[8px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">List</div>
                         <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
                             <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-lg tracking-tighter text-slate-700 dark:text-slate-200">Zvolte nastavení a stiskněte ▶ Začít</div>
                             <div id="cara" class="math-text font-mono text-2xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-0.5 opacity-0 transition-opacity duration-300"></div>
+                            <div style="height: 48px;"></div>
                         </div>
                     </div>
 
@@ -421,8 +422,8 @@
         }
 
         function updateBtnDisable() {
-            const isEmpty = odpovedEl.value.trim() === '';
-            tlacitkoEl.disabled = (zobrazitVysledek && isEmpty);
+            // Tlačítko už nikdy nedisablujeme – musí být vždy aktivní
+            tlacitkoEl.disabled = false;
         }
 
         function aktualizujTextTlacitka() {
@@ -520,9 +521,10 @@
                 const uziv = odpovedEl.value.trim();
                 
                 if (uziv === '') {
-                    // Prázdné pole – vložit správný výsledek do inputu
+                    // Prázdné pole – vložit správný výsledek naformátovaný do inputu
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
                     odpovedEl.value = formatujCislo(vysl);
+                    // Nic se nezapisuje do historie ani statistik
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
@@ -534,6 +536,7 @@
                     // Vyplněné pole – normální kontrola
                     const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                    // Uživatelův vstup zůstává v poli
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
