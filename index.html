@@ -439,7 +439,7 @@
             } else if (!zobrazitVysledek) {
                 tlacitkoEl.textContent = 'DALŠÍ PŘÍKLAD';
             } else {
-                tlacitkoEl.textContent = 'ZKONTROLOVAT';
+                tlacitkoEl.textContent = 'VÝSLEDEK(kontrola)';
             }
             updateBtnDisable();
         }
@@ -679,7 +679,7 @@
             chybaObserver.observe(chybaEl, { childList: true });
 
             input.addEventListener('focus', () => {
-                if (btn.textContent.trim() === 'ZKONTROLOVAT') {
+                if (btn.textContent.trim() === 'VÝSLEDEK(kontrola)') {
                     enterHint.style.opacity = '1';
                 }
             });
@@ -691,7 +691,7 @@
             const btnObserver = new MutationObserver(() => {
                 const text = btn.textContent.trim();
                 btn.classList.remove('state-start', 'state-result', 'btn-pulse', 'btn-glow-emerald');
-                if (text === 'ZKONTROLOVAT') {
+                if (text === 'VÝSLEDEK(kontrola)') {
                     btn.classList.add('state-result', 'btn-glow-emerald');
                 } else {
                     btn.classList.add('state-start', 'btn-pulse');
