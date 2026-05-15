@@ -242,12 +242,11 @@
                     <div id="chyba" class="text-red-500 text-[10px] font-bold text-center h-4 overflow-hidden mb-1" role="alert"></div>
 
                     <!-- Worksheet - compact -->
-                    <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl p-4 mb-3 worksheet-bg relative overflow-hidden min-h-[120px] flex flex-col justify-center">
+                    <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl p-4 mb-3 worksheet-bg relative overflow-hidden min-h-[90px] flex flex-col justify-center">
                         <div class="absolute top-2 right-3 text-[8px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">List</div>
                         <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
                             <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-lg tracking-tighter text-slate-700 dark:text-slate-200">Zvolte nastavení a stiskněte ▶ Začít</div>
                             <div id="cara" class="math-text font-mono text-2xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-0.5 opacity-0 transition-opacity duration-300"></div>
-                            <div id="vysledek" class="math-text font-mono text-2xl text-emerald-600 dark:text-emerald-400 font-bold mt-0.5 opacity-0 transition-opacity duration-300"></div>
                         </div>
                     </div>
 
@@ -256,7 +255,7 @@
                         <div class="relative">
                             <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
                                    placeholder="Váš výsledek"
-                                   class="w-full p-3 pr-10 text-lg text-center font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
+                                   class="w-full p-3 pr-10 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
                             <div id="inputIcon" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none"></div>
                         </div>
                         <div id="enterHint" class="text-[9px] text-slate-400 font-medium opacity-0 transition-opacity duration-200 select-none text-center -mt-1">Enter ↵</div>
@@ -314,7 +313,6 @@
         const chybaEl = document.getElementById('chyba');
         const prikladEl = document.getElementById('priklad');
         const caraEl = document.getElementById('cara');
-        const vysledekEl = document.getElementById('vysledek');
         const odpovedEl = document.getElementById('odpoved');
         const tlacitkoEl = document.getElementById('tlacitko');
         const divisionInfo = document.getElementById('divisionInfo');
@@ -411,17 +409,11 @@
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
             caraEl.textContent = '─'.repeat(max);
-            caraEl.style.visibility = 'hidden';
-            vysledekEl.textContent = ' '.repeat(max);
-            vysledekEl.style.visibility = 'hidden';
+            caraEl.style.opacity = '0';
         }
 
-        function zobrazVysledek(p) {
-            const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
-            const max = Math.max(formatujCislo(p.a).length, (p.op + ' ' + formatujCislo(p.b)).length, fv.length);
-            caraEl.style.visibility = 'visible';
-            vysledekEl.textContent = fv.padStart(max);
-            vysledekEl.style.visibility = 'visible';
+        function ukazCaru() {
+            caraEl.style.opacity = '1';
         }
 
         function aktivujPole() {
@@ -460,7 +452,7 @@
                 const trueTruncated = zkratNa4Desetinna(priklad.vysledek);
                 const trueNum = parseFloat(trueTruncated);
                 
-                // Convert user input to string and truncate to 4 decimal places (pad if needed)
+                // Convert user input to string and truncate to 4 decimal places
                 const userStr = norm;
                 const [userCela, userDes = ''] = userStr.split('.');
                 const userDesTruncated = userDes.substring(0, 4);
@@ -468,10 +460,9 @@
                 // Compare by truncating both to 4 decimal places
                 const userNumTruncated = parseFloat(userDesTruncated ? `${userCela}.${userDesTruncated}` : userCela);
                 
-                // Also check: if user entered only 3 decimals, check if truncated 3-dec matches true 3-dec
+                // Also check: if user entered only 3 decimals
                 const userDecimals = userDes.length;
                 if (userDecimals >= 3 && userDecimals <= 4) {
-                    // Truncate true result to same number of decimals as user input
                     const trueDesTruncated = zkratNa4Desetinna(priklad.vysledek).split('.')[1] || '';
                     const trueDesToMatch = trueDesTruncated.substring(0, userDecimals);
                     const trueToMatch = parseFloat(`${zkratNa4Desetinna(priklad.vysledek).split('.')[0]}.${trueDesToMatch}`);
@@ -521,6 +512,7 @@
                     divisionInfo.classList.add('hidden');
                 }
                 setTimeout(() => {
+                    ukazCaru();
                     aktivujPole();
                     isProcessing = false;
                 }, 50);
@@ -528,12 +520,12 @@
                 const uziv = odpovedEl.value.trim();
                 
                 if (uziv === '') {
-                    // Prázdné pole – jen zobrazit výsledek, nic nezapisovat
-                    zobrazVysledek(aktualniPriklad);
+                    // Prázdné pole – vložit správný výsledek do inputu
+                    const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
+                    odpovedEl.value = formatujCislo(vysl);
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
-                    // Focus zpět do pole
                     setTimeout(() => {
                         odpovedEl.focus();
                         isProcessing = false;
@@ -542,7 +534,6 @@
                     // Vyplněné pole – normální kontrola
                     const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    zobrazVysledek(aktualniPriklad);
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
@@ -651,7 +642,6 @@
             const chybaEl = document.getElementById('chyba');
             const prikladEl = document.getElementById('priklad');
             const caraEl = document.getElementById('cara');
-            const vysledekEl = document.getElementById('vysledek');
             const divisionInfo = document.getElementById('divisionInfo');
 
             scoreCorrect.textContent = correct;
@@ -663,7 +653,6 @@
 
             settingsToggle.addEventListener('click', () => {
                 settingsPanel.classList.toggle('collapsed');
-                // Show division info when panel is opened and division is selected
                 if (!settingsPanel.classList.contains('collapsed') && document.getElementById('operace').value === '/') {
                     divisionInfo.classList.remove('hidden');
                 } else if (settingsPanel.classList.contains('collapsed')) {
@@ -800,24 +789,19 @@
             });
             problemObserver.observe(prikladEl, { childList: true });
 
-            const vysledekObserver = new MutationObserver(() => {
-                const isVisible = vysledekEl.style.visibility === 'visible';
-                const hasContent = vysledekEl.textContent.trim() !== '';
-                if (isVisible && hasContent) {
-                    vysledekEl.classList.remove('slide-up');
-                    requestAnimationFrame(() => vysledekEl.classList.add('slide-up'));
-                    vysledekEl.style.opacity = '1';
-                    caraEl.style.opacity = '1';
-                } else {
-                    vysledekEl.style.opacity = '0';
-                    caraEl.style.opacity = '0';
+            // Observer for cara visibility
+            const caraObserver = new MutationObserver(() => {
+                const isVisible = caraEl.style.opacity === '1';
+                if (isVisible) {
+                    caraEl.classList.remove('fade-in');
+                    void caraEl.offsetWidth;
+                    caraEl.classList.add('fade-in');
                 }
             });
-            vysledekObserver.observe(vysledekEl, { childList: true });
+            caraObserver.observe(caraEl, { attributes: true, attributeFilter: ['style'] });
 
-            // ── Division operator change observer ──
+            // Division operator change observer
             const operaceObserver = document.getElementById('operace');
-            const origChangeHandler = operaceObserver.onchange;
             const divisionObserver = new MutationObserver(() => {
                 if (operaceObserver.value === '/' && !settingsPanel.classList.contains('collapsed')) {
                     divisionInfo.classList.remove('hidden');
