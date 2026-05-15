@@ -1,408 +1,335 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="cs" class="dark">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Trénink počítání</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', '"Courier New"', 'monospace'],
+                    },
+                },
+            },
+        }
+    </script>
     <style>
-        * {
-            box-sizing: border-box;
+        /* ─── Original overrides (preserved exactly) ─── */
+        .zelene {
+            background-color: #15803d !important;
+            border-color: #22c55e !important;
+            color: #ffffff !important;
+        }
+        .cervene {
+            background-color: #b91c1c !important;
+            border-color: #ef4444 !important;
+            color: #ffffff !important;
+        }
+        input {
+            -webkit-appearance: none;
+            border-radius: 0.75rem;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #000000;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
+        /* ─── New UX polish ─── */
+        .math-text {
+            white-space: pre;
+            line-height: 1.25;
+            display: block;
+            font-variant-numeric: tabular-nums;
         }
 
-        .container {
-            background: #0a0a0a;
-            padding: 15px 20px;
-            border-radius: 16px;
-            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
-            width: 95%;
-            max-width: 500px;
-            text-align: center;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
+        .worksheet-bg {
+            background-color: #f8fafc;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .worksheet-bg {
+            background-color: rgba(30, 41, 59, 0.4);
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
         }
 
-        h1 {
-            color: #ffffff;
-            margin-top: 0;
-            margin-bottom: 12px;
-            font-size: 1.8rem;
-            transition: color 0.3s ease;
+        .btn-pulse {
+            animation: pulse-blue 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-
-        .controls {
-            margin: 0 0 10px 0;
-            display: grid;
-            grid-template-columns: auto auto auto auto;
-            gap: 10px;
-            justify-content: center;
-            align-items: end;
+        @keyframes pulse-blue {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(37, 99, 235, 0);
+            }
         }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .btn-glow-emerald {
+            animation: glow-emerald 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #cccccc;
-            transition: color 0.3s ease;
-        }
-
-        .label-top {
-            font-weight: bold;
-            color: #cccccc;
-            line-height: 1.2;
-            font-size: 0.85rem;
-            transition: color 0.3s ease;
-        }
-
-        .label-bottom {
-            font-weight: bold;
-            color: #cccccc;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-            transition: color 0.3s ease;
-        }
-
-        select {
-            padding: 6px 4px;
-            font-size: 1rem;
-            border: 1px solid #333333;
-            border-radius: 8px;
-            background: #1a1a1a;
-            color: #ffffff;
-            width: 55px;
-            cursor: pointer;
-            transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
-        }
-
-        #operace {
-            width: 60px;
-        }
-
-        .pozadi-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .pozadi-top {
-            font-weight: bold;
-            color: #cccccc;
-            line-height: 1.2;
-            font-size: 0.85rem;
-            transition: color 0.3s ease;
-        }
-
-        .pozadi-bottom {
-            font-weight: bold;
-            color: #cccccc;
-            font-size: 0.85rem;
-            line-height: 1.2;
-            margin-bottom: 4px;
-            transition: color 0.3s ease;
-        }
-
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .toggle-label input[type="checkbox"] {
-            display: none;
-        }
-
-        .toggle-switch {
-            width: 44px;
-            height: 24px;
-            background: #333333;
-            border-radius: 12px;
-            position: relative;
-            transition: background 0.3s ease;
-            flex-shrink: 0;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #ffffff;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-label input:checked + .toggle-switch {
-            background: #3498db;
-        }
-
-        .toggle-label input:checked + .toggle-switch::after {
-            transform: translateX(20px);
+        @keyframes glow-emerald {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+            }
         }
 
         #tlacitko {
-            display: block;
-            padding: 12px 24px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
-            background-color: #3498db;
-            color: #ffffff;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-            min-width: 140px;
-            margin: 8px auto 0;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+            position: relative;
+        }
+        #tlacitko.state-start::before {
+            content: '▶';
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 0.85em;
+        }
+        #tlacitko.state-result::before {
+            content: '✓';
+            display: inline-block;
+            margin-right: 0.5rem;
+            font-size: 0.9em;
+            font-weight: 900;
         }
 
-        #tlacitko:hover {
-            background-color: #2980b9;
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
         }
-
-        #tlacitko:active {
-            background-color: #1c6ea4;
-        }
-
-        .priklad-oblast {
-            margin: 10px auto 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: fit-content;
-        }
-
-        .example,
-        .cara,
-        .result-line {
-            font-family: monospace;
-            font-size: 2.0rem;
-            line-height: 1.15;
-            white-space: pre;
-            text-align: right;
-            color: #ffffff;
-            transition: color 0.3s ease;
-        }
-
-        .cara {
-            color: #888888;
-            visibility: hidden;
-        }
-
-        .result-line {
-            color: #27ae60;
-            font-weight: bold;
-            visibility: hidden;
-        }
-
-        .odpoved-oblast {
-            margin: 8px 0 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #odpoved {
-            padding: 8px;
-            font-size: 1.2rem;
-            text-align: center;
-            border: 2px solid #444444;
-            border-radius: 8px;
-            width: 180px;
-            background: #1a1a1a;
-            color: #ffffff;
-            transition: border-color 0.3s, background-color 0.3s;
-            -webkit-appearance: none;
-            appearance: none;
-            pattern: "[0-9.,\-]*";
-            caret-color: #ffffff;
-        }
-
-        #odpoved.zelene {
-            background-color: #1b5e20;
-            border-color: #4caf50;
-        }
-
-        #odpoved.cervene {
-            background-color: #b71c1c;
-            border-color: #ef5350;
-        }
-
-        .error {
-            color: #ef5350;
-            font-weight: bold;
-            margin: 0 0 8px 0;
-            min-height: 0;
-            font-size: 0.9rem;
-        }
-
-        /* === ŠEDÝ REŽIM === */
-        body.sedy-rezim {
-            background-color: #d4d4d4;
-        }
-
-        body.sedy-rezim .container {
-            background: #f5f5f5;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        body.sedy-rezim h1 {
-            color: #2c3e50;
-        }
-
-        body.sedy-rezim label,
-        body.sedy-rezim .label-top,
-        body.sedy-rezim .label-bottom,
-        body.sedy-rezim .pozadi-top,
-        body.sedy-rezim .pozadi-bottom {
-            color: #555555;
-        }
-
-        body.sedy-rezim select {
-            background: #ffffff;
-            color: #333333;
-            border: 1px solid #cccccc;
-        }
-
-        body.sedy-rezim .toggle-switch {
-            background: #888888;
-        }
-
-        body.sedy-rezim .example,
-        body.sedy-rezim .cara,
-        body.sedy-rezim .result-line {
-            color: #333333;
-        }
-
-        body.sedy-rezim .cara {
-            color: #666666;
-        }
-
-        body.sedy-rezim .result-line {
-            color: #1b7a30;
-        }
-
-        body.sedy-rezim #odpoved {
-            background: #ffffff;
-            color: #333333;
-            border: 2px solid #cccccc;
-            caret-color: #333333;
-        }
-
-        body.sedy-rezim #odpoved.zelene {
-            background-color: #c8e6c9;
-            border-color: #4caf50;
-        }
-
-        body.sedy-rezim #odpoved.cervene {
-            background-color: #ffcdd2;
-            border-color: #ef5350;
-        }
-
-        @media (max-width: 600px) {
-            .example,
-            .cara,
-            .result-line {
-                font-size: 1.6rem;
+        @keyframes shake {
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
             }
-            #odpoved {
-                width: 150px;
-                font-size: 1.1rem;
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
             }
-            .controls {
-                gap: 8px;
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+        .slide-up {
+            animation: slideUp 0.35s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .pop {
+            animation: pop 0.25s ease-out;
+        }
+        @keyframes pop {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.25);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .settings-panel {
+            max-height: 200px;
+            opacity: 1;
+            overflow: hidden;
+            transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
+        }
+        .settings-panel.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            pointer-events: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* ─── Reduced motion support ─── */
+        @media (prefers-reduced-motion: reduce) {
+            .shake,
+            .pop,
+            .slide-up,
+            .fade-in {
+                animation: none !important;
+            }
+            #tlacitko.btn-pulse,
+            #tlacitko.btn-glow-emerald {
+                animation: none !important;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Trénink počítání</h1>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 font-sans">
 
-        <div class="controls">
-            <!-- Sloupec 1: Operace -->
-            <div class="control-group">
-                <label for="operace">Operace:</label>
-                <select id="operace">
-                    <option value="+">+</option>
-                    <option value="-">−</option>
-                    <option value="*">×</option>
-                    <option value="/">÷</option>
-                </select>
+    <!-- Theme Toggle -->
+    <button onclick="document.documentElement.classList.toggle('dark')"
+            class="fixed top-6 right-6 p-3 rounded-2xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 hover:scale-110 transition-all z-50 group"
+            aria-label="Přepnout tmavý/světlý režim">
+        <svg class="dark:hidden w-6 h-6 text-slate-500 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+        <svg class="hidden dark:inline w-6 h-6 text-amber-400 group-hover:text-amber-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+    </button>
+
+    <div class="w-full max-w-md">
+
+        <!-- Score Board -->
+        <div class="flex items-center justify-between mb-4 px-2 select-none">
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col items-center min-w-[3rem]">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Správně</span>
+                    <output id="scoreCorrect" aria-live="polite" class="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">0</output>
+                </div>
+                <div class="w-px h-8 bg-slate-300 dark:bg-slate-700"></div>
+                <div class="flex flex-col items-center min-w-[3rem]">
+                    <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Špatně</span>
+                    <output id="scoreWrong" aria-live="polite" class="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tabular-nums">0</output>
+                </div>
             </div>
-
-            <!-- Sloupec 2: 1. čísla -->
-            <div class="control-group">
-                <span class="label-top">Počet číslic</span>
-                <span class="label-bottom">1. čísla:</span>
-                <select id="cislice1"></select>
-            </div>
-
-            <!-- Sloupec 3: 2. čísla -->
-            <div class="control-group">
-                <span class="label-top">Počet číslic</span>
-                <span class="label-bottom">2. čísla:</span>
-                <select id="cislice2"></select>
-            </div>
-
-            <!-- Sloupec 4: Pozadí -->
-            <div class="pozadi-group">
-                <span class="pozadi-top">Pozadí</span>
-                <span class="pozadi-bottom" id="pozadi-text">světlé</span>
-                <label class="toggle-label" for="pozadi-toggle">
-                    <input type="checkbox" id="pozadi-toggle" />
-                    <span class="toggle-switch"></span>
-                </label>
+            <div class="flex flex-col items-end min-w-[3rem]">
+                <span class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Série</span>
+                <div class="flex items-center gap-1">
+                    <output id="streakCount" aria-live="polite" class="text-2xl font-black text-amber-500 dark:text-amber-400 font-mono tabular-nums">0</output>
+                    <svg class="w-5 h-5 text-amber-500 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
             </div>
         </div>
 
-        <div class="error" id="chyba"></div>
+        <!-- Main Card -->
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div class="p-6 md:p-8">
 
-        <div class="priklad-oblast">
-            <div class="example" id="priklad">Zatím žádný příklad</div>
-            <div class="cara" id="cara"></div>
-            <div class="result-line" id="vysledek"></div>
+                <!-- Header with Settings Toggle -->
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-black tracking-tight text-slate-800 dark:text-white uppercase">
+                        Trénink počítání
+                    </h1>
+                    <button id="settingsToggle" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300" title="Nastavení" aria-label="Nastavení operace a cifer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Settings Panel (collapsed by default) -->
+                <div id="settingsPanel" class="settings-panel mb-4 collapsed">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="flex flex-col">
+                            <label for="operace" class="text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">Operace</label>
+                            <select id="operace" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer font-bold text-sm">
+                                <option value="+">+</option>
+                                <option value="-">−</option>
+                                <option value="*">×</option>
+                                <option value="/">÷</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">1. Číslo</label>
+                            <select id="cislice1" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"></select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-[10px] font-bold uppercase text-slate-500 mb-1 ml-1">2. Číslo</label>
+                            <select id="cislice2" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error container (always present, now with role alert) -->
+                <div id="chyba" class="text-red-500 text-[11px] font-bold text-center h-5 overflow-hidden mb-2" role="alert"></div>
+
+                <!-- Worksheet -->
+                <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 mb-6 worksheet-bg relative overflow-hidden min-h-[180px] flex flex-col justify-center">
+                    <div class="absolute top-3 right-4 text-[10px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">Pracovní list</div>
+                    <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
+                        <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-xl md:text-2xl tracking-tighter text-slate-700 dark:text-slate-200">Zvol nastavení přes ozubené kolečko a stiskni ▶ Začít</div>
+                        <div id="cara" class="math-text font-mono text-3xl md:text-4xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-1 opacity-0 transition-opacity duration-300"></div>
+                        <div id="vysledek" class="math-text font-mono text-3xl md:text-4xl text-emerald-600 dark:text-emerald-400 font-bold mt-1 opacity-0 transition-opacity duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Action Area -->
+                <div class="space-y-4">
+                    <div class="relative">
+                        <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
+                               placeholder="Váš výsledek"
+                               class="w-full p-4 pr-12 text-2xl text-center font-mono font-bold rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner" />
+                        <div id="inputIcon" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none">
+                        </div>
+                        <div id="enterHint" class="absolute right-0 -bottom-5 text-[10px] text-slate-400 font-medium opacity-0 transition-opacity duration-200 select-none">Stiskni Enter ↵</div>
+                    </div>
+
+                    <button id="tlacitko" type="button"
+                            class="w-full py-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-blue-500/20 transition-all uppercase tracking-widest touch-manipulation btn-pulse state-start">
+                        ZAČÍT
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div class="odpoved-oblast">
-            <input type="text" id="odpoved" inputmode="decimal" autocomplete="off" />
+        <!-- History (with empty state) -->
+        <div id="historyContainer" class="mt-4 px-2 opacity-0 transition-opacity duration-500 select-none" aria-live="polite">
+            <div class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2">Historie</div>
+            <div id="historyList" class="flex flex-wrap gap-2">
+                <div id="historyEmpty" class="text-xs text-slate-400 dark:text-slate-500 italic">Zatím jsi nevyřešil(a) žádný příklad</div>
+            </div>
         </div>
-
-        <button id="tlacitko" type="button">START</button>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════
+         ORIGINAL LOGIC — ADAPTED with new button flow,
+         subtraction digit prevention, and empty-answer guard
+         ═══════════════════════════════════════════════════════ -->
     <script>
-        // === Pomocné funkce ===
+        let isProcessing = false;
+
         function formatujCislo(x) {
-            if (typeof x === 'bigint') {
-                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-            }
+            if (typeof x === 'bigint') return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             if (typeof x !== 'number') return String(x);
-            if (Number.isInteger(x)) {
-                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-            }
+            if (Number.isInteger(x)) return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             const [cela, des] = x.toString().split('.');
             const celaFmt = cela.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             return des ? `${celaFmt}.${des}` : celaFmt;
@@ -418,63 +345,8 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // === Ukládání a načítání nastavení ===
-        function ulozNastaveni() {
-            const nastaveni = {
-                operace: operaceEl.value,
-                cislice1: cislice1El.value,
-                cislice2: cislice2El.value,
-                sedyRezim: document.body.classList.contains('sedy-rezim')
-            };
-            try {
-                localStorage.setItem('treninkNastaveni', JSON.stringify(nastaveni));
-            } catch (e) {
-                console.warn('Nepodařilo se uložit nastavení:', e);
-            }
-        }
-
-        function nactiNastaveni() {
-            const ulozeno = localStorage.getItem('treninkNastaveni');
-            if (!ulozeno) return false;
-
-            try {
-                const nastaveni = JSON.parse(ulozeno);
-
-                if (['+', '-', '*', '/'].includes(nastaveni.operace)) {
-                    operaceEl.value = nastaveni.operace;
-                }
-
-                if (nastaveni.cislice1 >= 1 && nastaveni.cislice1 <= 9) {
-                    cislice1El.value = nastaveni.cislice1;
-                }
-                if (nastaveni.cislice2 >= 1 && nastaveni.cislice2 <= 9) {
-                    cislice2El.value = nastaveni.cislice2;
-                }
-
-                const pozadiCheckbox = document.getElementById('pozadi-toggle');
-                const pozadiText = document.getElementById('pozadi-text');
-                if (pozadiCheckbox && nastaveni.sedyRezim) {
-                    pozadiCheckbox.checked = true;
-                    document.body.classList.add('sedy-rezim');
-                    if (pozadiText) pozadiText.textContent = 'tmavé';
-                } else if (pozadiCheckbox) {
-                    pozadiCheckbox.checked = false;
-                    document.body.classList.remove('sedy-rezim');
-                    if (pozadiText) pozadiText.textContent = 'světlé';
-                }
-
-                return true;
-            } catch (e) {
-                console.warn('Nepodařilo se načíst nastavení:', e);
-                return false;
-            }
-        }
-
-        // === Globální proměnné ===
         let aktualniPriklad = null;
         let zobrazitVysledek = false;
-
-        // === DOM elementy ===
         const operaceEl = document.getElementById('operace');
         const cislice1El = document.getElementById('cislice1');
         const cislice2El = document.getElementById('cislice2');
@@ -484,27 +356,50 @@
         const vysledekEl = document.getElementById('vysledek');
         const odpovedEl = document.getElementById('odpoved');
         const tlacitkoEl = document.getElementById('tlacitko');
-        const pozadiToggleEl = document.getElementById('pozadi-toggle');
-        const pozadiTextEl = document.getElementById('pozadi-text');
 
-        // === Naplnění selectů ===
+        // ── Dynamic disabling for subtraction ──
+        function aktualizujCislici2() {
+            const op = operaceEl.value;
+            const firstVal = parseInt(cislice1El.value);
+            const options = cislice2El.options;
+            for (let i = 0; i < options.length; i++) {
+                const val = parseInt(options[i].value);
+                options[i].disabled = (op === '-' && val > firstVal);
+            }
+            // If the currently selected value is now disabled, move it to the highest allowed
+            if (parseInt(cislice2El.value) > firstVal && op === '-') {
+                cislice2El.value = firstVal;
+            }
+        }
+
         function naplnSelecty() {
             for (let i = 1; i <= 9; i++) {
                 cislice1El.innerHTML += `<option value="${i}">${i}</option>`;
                 cislice2El.innerHTML += `<option value="${i}">${i}</option>`;
             }
+            cislice1El.value = '2';
+            cislice2El.value = '1';
+            aktualizujCislici2(); // initial enforcement
         }
 
-        // === Generování příkladu ===
+        // Trigger on relevant changes
+        operaceEl.addEventListener('change', () => {
+            aktualizujCislici2();
+            chybaEl.textContent = ''; // clear any previous error
+        });
+        cislice1El.addEventListener('change', () => {
+            aktualizujCislici2();
+        });
+
         function vygenerujPriklad() {
             const op = operaceEl.value;
             const n1 = parseInt(cislice1El.value);
             const n2 = parseInt(cislice2El.value);
-
             chybaEl.textContent = '';
 
+            // The UI now prevents impossible combos, but we leave a fallback check.
             if (op === '-' && n1 < n2) {
-                chybaEl.textContent = '❌ Nelze: 1. číslo má méně číslic → výsledek by byl záporný.';
+                chybaEl.textContent = '❌ Při odčítání musí mít první číslo alespoň tolik cifer jako druhé.';
                 return null;
             }
 
@@ -517,28 +412,19 @@
                 if (op === '/' && b === 0) continue;
                 break;
             }
-
-            if (pokusy >= 1000) {
-                chybaEl.textContent = '❌ Nepodařilo se vygenerovat platný příklad.';
-                return null;
-            }
-
             let vysledek;
             if (op === '+') vysledek = a + b;
             else if (op === '-') vysledek = a - b;
             else if (op === '*') vysledek = BigInt(a) * BigInt(b);
             else if (op === '/') vysledek = a / b;
-
             return { a, b, op, vysledek };
         }
 
-        // === Zobrazení příkladu ===
         function zobrazPriklad(p) {
             const fa = formatujCislo(p.a);
             const fb = formatujCislo(p.b);
             const fv = formatujCislo(p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
-
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
             caraEl.textContent = '─'.repeat(max);
             caraEl.style.visibility = 'hidden';
@@ -546,72 +432,69 @@
             vysledekEl.style.visibility = 'hidden';
         }
 
-        // === Zobrazení výsledku ===
         function zobrazVysledek(p) {
             const fv = formatujCislo(p.vysledek);
-            const max = Math.max(
-                formatujCislo(p.a).length,
-                (p.op + ' ' + formatujCislo(p.b)).length,
-                fv.length
-            );
+            const max = Math.max(formatujCislo(p.a).length, (p.op + ' ' + formatujCislo(p.b)).length, fv.length);
             caraEl.style.visibility = 'visible';
             vysledekEl.textContent = fv.padStart(max);
             vysledekEl.style.visibility = 'visible';
         }
 
-        // === Udržení klávesnice ===
         function aktivujPole() {
-            odpovedEl.readOnly = true;
             odpovedEl.focus();
-            odpovedEl.readOnly = false;
-
-            setTimeout(function() {
-                if (document.activeElement !== odpovedEl) {
-                    odpovedEl.focus();
-                }
-            }, 100);
         }
 
-        function vratKlavesnici() {
-            if (document.activeElement !== odpovedEl) {
-                aktivujPole();
+        // Disable the check button when input is empty and we're in "check" mode
+        function updateBtnDisable() {
+            // Disable only when waiting for answer (zobrazitVysledek = true) and input empty
+            const isEmpty = odpovedEl.value.trim() === '';
+            tlacitkoEl.disabled = (zobrazitVysledek && isEmpty);
+        }
+
+        function aktualizujTextTlacitka() {
+            if (!aktualniPriklad) {
+                tlacitkoEl.textContent = 'ZAČÍT';
+            } else if (!zobrazitVysledek) {
+                tlacitkoEl.textContent = 'DALŠÍ PŘÍKLAD';
+            } else {
+                tlacitkoEl.textContent = 'ZKONTROLOVAT';
             }
-            odpovedEl.click();
+            updateBtnDisable();
         }
 
-        // === Hlavní obsluha tlačítka ===
+        odpovedEl.addEventListener('input', updateBtnDisable);
+
         function handleTlacitko(e) {
-            if (e) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            if (e && e.preventDefault) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-
             odpovedEl.classList.remove('zelene', 'cervene');
 
             if (!zobrazitVysledek) {
+                // Generate new problem
                 const p = vygenerujPriklad();
                 if (!p) {
-                    tlacitkoEl.textContent = 'START';
-                    zobrazitVysledek = false;
-                    setTimeout(vratKlavesnici, 150);
+                    isProcessing = false;
                     return;
                 }
                 aktualniPriklad = p;
                 zobrazPriklad(p);
                 odpovedEl.value = '';
-                tlacitkoEl.textContent = 'VÝSLEDEK';
                 zobrazitVysledek = true;
-
-                setTimeout(function() {
+                aktualizujTextTlacitka();
+                setTimeout(() => {
                     aktivujPole();
-                }, 100);
+                    isProcessing = false;
+                }, 50);
             } else {
+                // Check answer
                 const uziv = odpovedEl.value;
                 const norm = normalizuj(uziv);
-
-                if (norm === '') {
-                    zobrazVysledek(aktualniPriklad);
-                } else {
+                if (norm !== '') {
                     let spravne = false;
                     const v = aktualniPriklad.vysledek;
                     if (typeof v === 'bigint') {
@@ -620,99 +503,219 @@
                         } catch {
                             spravne = false;
                         }
-                    } else if (typeof v === 'number') {
+                    } else {
                         const num = parseFloat(norm);
                         spravne = !isNaN(num) && Math.abs(num - v) < 1e-9;
                     }
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    zobrazVysledek(aktualniPriklad);
                 }
-                tlacitkoEl.textContent = 'START';
+                zobrazVysledek(aktualniPriklad);
                 zobrazitVysledek = false;
-
-                setTimeout(function() {
-                    vratKlavesnici();
-                }, 50);
+                aktualizujTextTlacitka();
+                setTimeout(() => isProcessing = false, 150);
             }
-
-            return false;
         }
 
-        // === Event listenery ===
-        tlacitkoEl.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            handleTlacitko(e);
-        }, { passive: false });
-
-        tlacitkoEl.addEventListener('click', function(e) {
-            if (e.pointerType === 'touch') return;
-            handleTlacitko(e);
+        tlacitkoEl.addEventListener('touchstart', handleTlacitko, { passive: false });
+        tlacitkoEl.addEventListener('click', (e) => {
+            if (e.pointerType !== 'touch') handleTlacitko(e);
+        });
+        odpovedEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleTlacitko(e);
         });
 
-        tlacitkoEl.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleTlacitko(e);
-            }
-        });
-
-        odpovedEl.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleTlacitko(e);
-            }
-        });
-
-        odpovedEl.addEventListener('blur', function() {
-            if (zobrazitVysledek) {
-                setTimeout(function() {
-                    if (zobrazitVysledek && document.activeElement !== odpovedEl) {
-                        vratKlavesnici();
-                    }
-                }, 200);
-            }
-        });
-
-        [operaceEl, cislice1El, cislice2El].forEach(function(el) {
-            el.addEventListener('change', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-                ulozNastaveni();
-            });
-            el.addEventListener('blur', function() {
-                if (zobrazitVysledek) {
-                    setTimeout(vratKlavesnici, 200);
-                }
-            });
-        });
-
-        pozadiToggleEl.addEventListener('change', function() {
-            if (this.checked) {
-                document.body.classList.add('sedy-rezim');
-                pozadiTextEl.textContent = 'tmavé';
-            } else {
-                document.body.classList.remove('sedy-rezim');
-                pozadiTextEl.textContent = 'světlé';
-            }
-            ulozNastaveni();
-        });
-
-        // === Inicializace ===
         naplnSelecty();
-        
-        const nacteno = nactiNastaveni();
-        
-        if (!nacteno) {
-            operaceEl.value = '+';
-            cislice1El.value = '2';
-            cislice2El.value = '1';
-            pozadiTextEl.textContent = 'světlé';
-        }
+        aktualizujTextTlacitka(); // set initial button text
+        updateBtnDisable();
+        setTimeout(aktivujPole, 100);
+    </script>
 
-        setTimeout(function() {
-            odpovedEl.focus();
-        }, 100);
+    <!-- ═══════════════════════════════════════════════════════
+         UI ENHANCEMENT LAYER — safe observers, no freeze risk
+         (adapted to new button text patterns)
+         ═══════════════════════════════════════════════════════ -->
+    <script>
+        (function() {
+            let correct = 0,
+                wrong = 0,
+                streak = 0,
+                history = [];
+
+            const btn = document.getElementById('tlacitko');
+            const input = document.getElementById('odpoved');
+            const inputIcon = document.getElementById('inputIcon');
+            const enterHint = document.getElementById('enterHint');
+            const scoreCorrect = document.getElementById('scoreCorrect');
+            const scoreWrong = document.getElementById('scoreWrong');
+            const streakCount = document.getElementById('streakCount');
+            const historyContainer = document.getElementById('historyContainer');
+            const historyList = document.getElementById('historyList');
+            const historyEmpty = document.getElementById('historyEmpty');
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const chybaEl = document.getElementById('chyba');
+            const prikladEl = document.getElementById('priklad');
+            const caraEl = document.getElementById('cara');
+            const vysledekEl = document.getElementById('vysledek');
+
+            const iconCheck =
+                `<svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+            const iconCross =
+                `<svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+            // Settings toggle
+            settingsToggle.addEventListener('click', () => {
+                settingsPanel.classList.toggle('collapsed');
+            });
+
+            // Auto-expand settings when error appears
+            const chybaObserver = new MutationObserver(() => {
+                if (chybaEl.textContent.trim()) {
+                    settingsPanel.classList.remove('collapsed');
+                }
+            });
+            chybaObserver.observe(chybaEl, { childList: true });
+
+            // Input hints
+            input.addEventListener('focus', () => {
+                if (btn.textContent.trim() === 'ZKONTROLOVAT') {
+                    enterHint.style.opacity = '1';
+                }
+            });
+            input.addEventListener('blur', () => enterHint.style.opacity = '0');
+            input.addEventListener('input', () => {
+                if (input.value.length > 0) enterHint.style.opacity = '0';
+            });
+
+            // ── Button state observer (adapts to ZAČÍT / ZKONTROLOVAT / DALŠÍ PŘÍKLAD) ──
+            const btnObserver = new MutationObserver(() => {
+                const text = btn.textContent.trim();
+                btn.classList.remove('state-start', 'state-result', 'btn-pulse', 'btn-glow-emerald');
+                if (text === 'ZKONTROLOVAT') {
+                    btn.classList.add('state-result', 'btn-glow-emerald');
+                } else {
+                    // ZAČÍT or DALŠÍ PŘÍKLAD
+                    btn.classList.add('state-start', 'btn-pulse');
+                }
+            });
+            btnObserver.observe(btn, { childList: true, characterData: true, subtree: true });
+
+            // ── Score & feedback observer ──
+            let processedZelene = false;
+            let processedCervene = false;
+
+            const inputObserver = new MutationObserver((mutations) => {
+                mutations.forEach((m) => {
+                    if (m.type === 'attributes' && m.attributeName === 'class') {
+                        const cls = input.classList;
+                        if (cls.contains('zelene')) {
+                            if (processedZelene) return;
+                            processedZelene = true;
+                            correct++;
+                            streak++;
+                            inputIcon.innerHTML = iconCheck;
+                            inputIcon.style.opacity = '1';
+                            inputIcon.style.transform = 'translateY(-50%) scale(1)';
+                            updateScores();
+                            addHistory(true);
+                        } else if (cls.contains('cervene')) {
+                            if (processedCervene) return;
+                            processedCervene = true;
+                            wrong++;
+                            streak = 0;
+                            inputIcon.innerHTML = iconCross;
+                            inputIcon.style.opacity = '1';
+                            inputIcon.style.transform = 'translateY(-50%) scale(1)';
+                            input.classList.add('shake');
+                            setTimeout(() => input.classList.remove('shake'), 500);
+                            updateScores();
+                            addHistory(false);
+                        } else {
+                            processedZelene = false;
+                            processedCervene = false;
+                            inputIcon.style.opacity = '0';
+                            inputIcon.style.transform = 'translateY(-50%) scale(0.75)';
+                        }
+                    }
+                });
+            });
+            inputObserver.observe(input, { attributes: true, attributeFilter: ['class'] });
+
+            function updateScores() {
+                scoreCorrect.textContent = correct;
+                scoreWrong.textContent = wrong;
+                streakCount.textContent = streak;
+                streakCount.parentElement.classList.add('pop');
+                setTimeout(() => streakCount.parentElement.classList.remove('pop'), 250);
+            }
+
+            function addHistory(isCorrect) {
+                let text = '';
+                if (typeof aktualniPriklad !== 'undefined' && aktualniPriklad) {
+                    const p = aktualniPriklad;
+                    const fmt = (typeof formatujCislo === 'function') ? formatujCislo : (x) => String(x);
+                    text = `${fmt(p.a)} ${p.op} ${fmt(p.b)} = ${fmt(p.vysledek)}`;
+                } else {
+                    text = prikladEl.textContent.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                }
+                if (!text || text === 'Vyber nastavení a stiskni ▶') return;
+                history.unshift({ text, correct: isCorrect });
+                if (history.length > 5) history.pop();
+                renderHistory();
+            }
+
+            function renderHistory() {
+                if (history.length === 0) {
+                    historyEmpty.style.display = 'block'; // show empty message
+                    historyContainer.style.opacity = '0'; // keep container hidden
+                    historyList.querySelectorAll('.history-item').forEach(el => el.remove());
+                    return;
+                }
+                historyEmpty.style.display = 'none';
+                historyContainer.style.opacity = '1';
+                // Remove previous items except the empty message
+                historyList.querySelectorAll('.history-item').forEach(el => el.remove());
+                history.forEach((h, i) => {
+                    const item = document.createElement('div');
+                    item.className =
+                        `history-item slide-up px-3 py-1.5 rounded-lg text-xs font-mono font-bold border ${
+                        h.correct
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
+                    }`;
+                    item.style.animationDelay = `${i * 60}ms`;
+                    item.innerHTML = `${h.text} ${h.correct ? '✓' : '✗'}`;
+                    historyList.appendChild(item);
+                });
+            }
+
+            // ── Problem reveal animation ──
+            const problemObserver = new MutationObserver(() => {
+                const txt = prikladEl.textContent;
+                if (txt && txt !== 'Vyber nastavení a stiskni ▶') {
+                    prikladEl.classList.remove('fade-in');
+                    void prikladEl.offsetWidth;
+                    prikladEl.classList.add('fade-in');
+                }
+            });
+            problemObserver.observe(prikladEl, { childList: true });
+
+            // ── Answer reveal animation ──
+            const vysledekObserver = new MutationObserver(() => {
+                const isVisible = vysledekEl.style.visibility === 'visible';
+                const hasContent = vysledekEl.textContent.trim() !== '';
+                if (isVisible && hasContent) {
+                    vysledekEl.classList.remove('slide-up');
+                    requestAnimationFrame(() => vysledekEl.classList.add('slide-up'));
+                    vysledekEl.style.opacity = '1';
+                    caraEl.style.opacity = '1';
+                } else {
+                    vysledekEl.style.opacity = '0';
+                    caraEl.style.opacity = '0';
+                }
+            });
+            vysledekObserver.observe(vysledekEl, { childList: true });
+        })();
     </script>
 </body>
 </html>
