@@ -246,7 +246,7 @@
                         <div class="absolute top-2 right-3 text-[8px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">List</div>
                         <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
                             <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-lg tracking-tighter text-slate-700 dark:text-slate-200">Zvolte nastavení a stiskněte ▶ Začít</div>
-                            <div id="cara" class="math-text font-mono text-2xl text-slate-400 dark:text-slate-600 border-t-0 border-slate-300 dark:border-slate-600 w-full mt-0.5 opacity-0 transition-opacity duration-300"></div>
+                            <div id="cara" class="math-text font-mono text-2xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-0.5 opacity-0 transition-opacity duration-300"></div>
                         </div>
                     </div>
 
@@ -408,7 +408,7 @@
             const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-            caraEl.textContent = '─'.repeat(max);
+            //caraEl.textContent = '─'.repeat(max);
             caraEl.style.opacity = '0';
         }
 
