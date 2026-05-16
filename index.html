@@ -232,7 +232,6 @@
                                 <select id="cislice2" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-xs"></select>
                             </div>
                         </div>
-                        <!-- Division info -->
                         <div id="divisionInfo" class="hidden mt-2 text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
                             Dělení zobrazí přesně 4 desetinná místa. Odpověď na 3–4 des. místa je uznána.
                         </div>
@@ -252,7 +251,7 @@
                     <!-- Action Area -->
                     <div class="space-y-2.5">
                         <div class="relative">
-                            <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
+                            <input type="text" id="odpoved" enterkeyhint="done" autocomplete="off"
                                    placeholder="Váš výsledek"
                                    class="w-full pl-3 pr-4 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
                             <div id="inputIcon" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none"></div>
@@ -275,7 +274,6 @@
                 </div>
             </div>
 
-            <!-- Bottom spacer for mobile -->
             <div class="h-4"></div>
         </div>
     </div>
@@ -431,6 +429,14 @@
 
         odpovedEl.addEventListener('input', updateBtnDisable);
 
+        // Kontrola, zda je vstup platné číslo
+        function jePlatneCislo(vstup) {
+            if (vstup === '') return false;
+            const norm = normalizuj(vstup);
+            if (norm === '') return false;
+            return /^-?\d+([.,]\d*)?$/.test(norm);
+        }
+
         function zkontrolujOdpoved(uzivatelskaOdpoved, priklad) {
             const norm = normalizuj(uzivatelskaOdpoved);
             if (norm === '') return false;
@@ -509,6 +515,7 @@
                 } else {
                     divisionInfo.classList.add('hidden');
                 }
+                chybaEl.textContent = '';
                 setTimeout(() => {
                     ukazCaru();
                     aktivujPole();
@@ -519,22 +526,36 @@
             else {
                 const uziv = inputText;
                 
+                // Prázdné pole – zobrazit výsledek
                 if (uziv === '') {
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
                     odpovedEl.value = formatujCislo(vysl);
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
+                    chybaEl.textContent = '';
                     setTimeout(() => {
                         odpovedEl.focus();
                         isProcessing = false;
                     }, 50);
-                } else {
+                }
+                // Neplatný vstup (není číslo) – zobrazit hlášku a zastavit
+                else if (!jePlatneCislo(uziv)) {
+                    chybaEl.textContent = '⚠️ Vložil jste nepovolený znak, opravte!';
+                    odpovedEl.classList.add('shake');
+                    setTimeout(() => odpovedEl.classList.remove('shake'), 500);
+                    // Tlačítko zůstává na VÝSLEDEK(kontrola), input se nemaže
+                    isProcessing = false;
+                    setTimeout(() => odpovedEl.focus(), 100);
+                }
+                // Platné číslo – normální kontrola
+                else {
                     const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
+                    chybaEl.textContent = '';
                     setTimeout(() => isProcessing = false, 150);
                 }
             }
@@ -546,6 +567,13 @@
         });
         odpovedEl.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') handleTlacitko(e);
+        });
+
+        // Vymazat chybovou hlášku při psaní
+        odpovedEl.addEventListener('input', () => {
+            if (chybaEl.textContent.includes('nepovolený znak')) {
+                chybaEl.textContent = '';
+            }
         });
 
         naplnSelecty();
@@ -748,7 +776,6 @@
                 }
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
-                // Bez omezení počtu položek
                 renderHistory();
             }
 
