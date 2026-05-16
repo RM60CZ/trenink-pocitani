@@ -484,8 +484,9 @@
             }
         }
 
-        // ── Check if input is a valid number ──
+        // ── Check if input is a valid number (non-empty) ──
         function jePlatneCislo(vstup) {
+            if (vstup === '') return false;
             const norm = normalizuj(vstup);
             if (norm === '') return false;
             // Allow negative sign at the beginning and one decimal point
@@ -502,24 +503,23 @@
             }
             odpovedEl.classList.remove('zelene', 'cervene');
 
-            // ── Check if "vymazat" is typed when button says "ZAČÍT" ──
-            if (!aktualniPriklad || !zobrazitVysledek) {
-                const btnText = tlacitkoEl.textContent.trim();
-                if (btnText === 'ZAČÍT' || btnText === 'DALŠÍ PŘÍKLAD') {
-                    const inputText = odpovedEl.value.trim().toLowerCase();
-                    if (inputText === 'vymazat') {
-                        // Vymazat celou historii
-                        if (typeof window.clearHistory === 'function') {
-                            window.clearHistory();
-                        }
-                        odpovedEl.value = '';
-                        odpovedEl.placeholder = 'Váš výsledek';
-                        isProcessing = false;
-                        return;
+            const btnText = tlacitkoEl.textContent.trim();
+            const inputText = odpovedEl.value.trim();
+
+            // ── Smazání historie při ZAČÍT + "vymazat" ──
+            if (btnText === 'ZAČÍT') {
+                if (normalizuj(inputText) === 'vymazat') {
+                    if (typeof window.clearHistory === 'function') {
+                        window.clearHistory();
                     }
+                    odpovedEl.value = '';
+                    odpovedEl.placeholder = 'Váš výsledek';
+                    isProcessing = false;
+                    return;
                 }
             }
 
+            // ── ZAČÍT nebo DALŠÍ PŘÍKLAD → vygenerovat nový příklad ──
             if (!zobrazitVysledek) {
                 const p = vygenerujPriklad();
                 if (!p) {
@@ -542,21 +542,11 @@
                     aktivujPole();
                     isProcessing = false;
                 }, 50);
-            } else {
-                const uziv = odpovedEl.value.trim();
-                
-                // ── Check if input is not a valid number ──
-                if (!jePlatneCislo(uziv)) {
-                    // Vymazat obsah inputu, ukázat placeholder, nepřepínat tlačítko
-                    odpovedEl.value = '';
-                    odpovedEl.placeholder = 'Váš výsledek';
-                    // Tlačítko zůstává na "VÝSLEDEK(kontrola)"
-                    isProcessing = false;
-                    return;
-                }
-
-                if (uziv === '') {
-                    // Prázdné pole – vložit správný výsledek naformátovaný do inputu
+            } 
+            // ── VÝSLEDEK(kontrola) ──
+            else {
+                // Prázdné pole → zobrazit správný výsledek
+                if (inputText === '') {
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
                     odpovedEl.value = formatujCislo(vysl);
                     // Nic se nezapisuje do historie ani statistik
@@ -567,16 +557,30 @@
                         odpovedEl.focus();
                         isProcessing = false;
                     }, 50);
-                } else {
-                    // Vyplněné pole – normální kontrola
-                    const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
-                    odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    // Uživatelův vstup zůstává v poli
-                    zobrazitVysledek = false;
-                    aktualizujTextTlacitka();
-                    divisionInfo.classList.add('hidden');
-                    setTimeout(() => isProcessing = false, 150);
+                    return;
                 }
+
+                // ── Kontrola neplatného vstupu (ne-číslo) ──
+                if (!jePlatneCislo(inputText)) {
+                    // Vymazat input, ukázat placeholder, NEPŘEPÍNAT tlačítko
+                    odpovedEl.value = '';
+                    odpovedEl.placeholder = 'Váš výsledek';
+                    // Tlačítko zůstává na "VÝSLEDEK(kontrola)" – nevoláme aktualizujTextTlacitka()
+                    setTimeout(() => {
+                        odpovedEl.focus();
+                        isProcessing = false;
+                    }, 50);
+                    return;
+                }
+
+                // ── Platné číslo → normální kontrola ──
+                const spravne = zkontrolujOdpoved(inputText, aktualniPriklad);
+                odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                // Uživatelův vstup zůstává v poli
+                zobrazitVysledek = false;
+                aktualizujTextTlacitka();
+                divisionInfo.classList.add('hidden');
+                setTimeout(() => isProcessing = false, 150);
             }
         }
 
@@ -789,7 +793,6 @@
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
                 // ── ZMĚNA: Neomezujeme počet položek na 5, zobrazujeme celou historii ──
-                // if (history.length > 5) history.pop();  // PŮVODNÍ OMEZENÍ – ODSTRANĚNO
                 renderHistory();
             }
 
@@ -802,24 +805,6 @@
                 updateScores();
                 renderHistory();
                 saveState();
-                // Reset input po smazání
-                if (typeof odpovedEl !== 'undefined') {
-                    odpovedEl.value = '';
-                    odpovedEl.placeholder = 'Váš výsledek';
-                }
-                // Reset aktuálního příkladu
-                if (typeof zobrazitVysledek !== 'undefined') {
-                    zobrazitVysledek = false;
-                }
-                if (typeof aktualniPriklad !== 'undefined') {
-                    aktualniPriklad = null;
-                }
-                if (typeof aktualizujTextTlacitka === 'function') {
-                    aktualizujTextTlacitka();
-                }
-                if (typeof updateBtnDisable === 'function') {
-                    updateBtnDisable();
-                }
             };
 
             function renderHistory() {
