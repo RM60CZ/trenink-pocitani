@@ -255,7 +255,7 @@
                         <div class="relative">
                             <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
                                    placeholder="Váš výsledek"
-                                   class="w-full pl-3 pr-4 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
+                                   class="w-full pl-3 pr-0 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
                             <div id="inputIcon" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none"></div>
                         </div>
                         <div id="enterHint" class="text-[9px] text-slate-400 font-medium opacity-0 transition-opacity duration-200 select-none text-center -mt-1">Enter ↵</div>
@@ -408,7 +408,7 @@
             const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-            //caraEl.textContent = '─'.repeat(max);
+            caraEl.textContent = '─'.repeat(max);
             caraEl.style.opacity = '0';
         }
 
@@ -484,15 +484,6 @@
             }
         }
 
-        // ── Check if input is a valid number (non-empty) ──
-        function jePlatneCislo(vstup) {
-            if (vstup === '') return false;
-            const norm = normalizuj(vstup);
-            if (norm === '') return false;
-            // Allow negative sign at the beginning and one decimal point
-            return /^-?\d+([.,]\d*)?$/.test(norm);
-        }
-
         function handleTlacitko(e) {
             if (isProcessing) return;
             isProcessing = true;
@@ -503,23 +494,6 @@
             }
             odpovedEl.classList.remove('zelene', 'cervene');
 
-            const btnText = tlacitkoEl.textContent.trim();
-            const inputText = odpovedEl.value.trim();
-
-            // ── Smazání historie při ZAČÍT + "vymazat" ──
-            if (btnText === 'ZAČÍT') {
-                if (normalizuj(inputText) === 'vymazat') {
-                    if (typeof window.clearHistory === 'function') {
-                        window.clearHistory();
-                    }
-                    odpovedEl.value = '';
-                    odpovedEl.placeholder = 'Váš výsledek';
-                    isProcessing = false;
-                    return;
-                }
-            }
-
-            // ── ZAČÍT nebo DALŠÍ PŘÍKLAD → vygenerovat nový příklad ──
             if (!zobrazitVysledek) {
                 const p = vygenerujPriklad();
                 if (!p) {
@@ -542,11 +516,11 @@
                     aktivujPole();
                     isProcessing = false;
                 }, 50);
-            } 
-            // ── VÝSLEDEK(kontrola) ──
-            else {
-                // Prázdné pole → zobrazit správný výsledek
-                if (inputText === '') {
+            } else {
+                const uziv = odpovedEl.value.trim();
+                
+                if (uziv === '') {
+                    // Prázdné pole – vložit správný výsledek naformátovaný do inputu
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
                     odpovedEl.value = formatujCislo(vysl);
                     // Nic se nezapisuje do historie ani statistik
@@ -557,30 +531,16 @@
                         odpovedEl.focus();
                         isProcessing = false;
                     }, 50);
-                    return;
+                } else {
+                    // Vyplněné pole – normální kontrola
+                    const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
+                    odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
+                    // Uživatelův vstup zůstává v poli
+                    zobrazitVysledek = false;
+                    aktualizujTextTlacitka();
+                    divisionInfo.classList.add('hidden');
+                    setTimeout(() => isProcessing = false, 150);
                 }
-
-                // ── Kontrola neplatného vstupu (ne-číslo) ──
-                if (!jePlatneCislo(inputText)) {
-                    // Vymazat input, ukázat placeholder, NEPŘEPÍNAT tlačítko
-                    odpovedEl.value = '';
-                    odpovedEl.placeholder = 'Váš výsledek';
-                    // Tlačítko zůstává na "VÝSLEDEK(kontrola)" – nevoláme aktualizujTextTlacitka()
-                    setTimeout(() => {
-                        odpovedEl.focus();
-                        isProcessing = false;
-                    }, 50);
-                    return;
-                }
-
-                // ── Platné číslo → normální kontrola ──
-                const spravne = zkontrolujOdpoved(inputText, aktualniPriklad);
-                odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                // Uživatelův vstup zůstává v poli
-                zobrazitVysledek = false;
-                aktualizujTextTlacitka();
-                divisionInfo.classList.add('hidden');
-                setTimeout(() => isProcessing = false, 150);
             }
         }
 
@@ -792,20 +752,9 @@
                 }
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
-                // ── ZMĚNA: Neomezujeme počet položek na 5, zobrazujeme celou historii ──
+                if (history.length > 5) history.pop();
                 renderHistory();
             }
-
-            // ── Funkce pro vymazání historie ──
-            window.clearHistory = function() {
-                history = [];
-                correct = 0;
-                wrong = 0;
-                streak = 0;
-                updateScores();
-                renderHistory();
-                saveState();
-            };
 
             function renderHistory() {
                 if (history.length === 0) {
