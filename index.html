@@ -255,7 +255,7 @@
                         <div class="relative">
                             <input type="text" id="odpoved" inputmode="decimal" enterkeyhint="done" autocomplete="off"
                                    placeholder="Váš výsledek"
-                                   class="w-full pl-3 pr-0 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
+                                   class="w-full pl-3 pr-4 text-lg font-mono font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all shadow-inner text-right" />
                             <div id="inputIcon" class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 transition-all duration-200 transform scale-75 pointer-events-none"></div>
                         </div>
                         <div id="enterHint" class="text-[9px] text-slate-400 font-medium opacity-0 transition-opacity duration-200 select-none text-center -mt-1">Enter ↵</div>
@@ -408,7 +408,7 @@
             const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-            caraEl.textContent = '─'.repeat(max);
+            //caraEl.textContent = '─'.repeat(max);
             caraEl.style.opacity = '0';
         }
 
