@@ -484,6 +484,14 @@
             }
         }
 
+        // ── Check if input is a valid number ──
+        function jePlatneCislo(vstup) {
+            const norm = normalizuj(vstup);
+            if (norm === '') return false;
+            // Allow negative sign at the beginning and one decimal point
+            return /^-?\d+([.,]\d*)?$/.test(norm);
+        }
+
         function handleTlacitko(e) {
             if (isProcessing) return;
             isProcessing = true;
@@ -493,6 +501,24 @@
                 e.stopPropagation();
             }
             odpovedEl.classList.remove('zelene', 'cervene');
+
+            // ── Check if "vymazat" is typed when button says "ZAČÍT" ──
+            if (!aktualniPriklad || !zobrazitVysledek) {
+                const btnText = tlacitkoEl.textContent.trim();
+                if (btnText === 'ZAČÍT' || btnText === 'DALŠÍ PŘÍKLAD') {
+                    const inputText = odpovedEl.value.trim().toLowerCase();
+                    if (inputText === 'vymazat') {
+                        // Vymazat celou historii
+                        if (typeof window.clearHistory === 'function') {
+                            window.clearHistory();
+                        }
+                        odpovedEl.value = '';
+                        odpovedEl.placeholder = 'Váš výsledek';
+                        isProcessing = false;
+                        return;
+                    }
+                }
+            }
 
             if (!zobrazitVysledek) {
                 const p = vygenerujPriklad();
@@ -519,6 +545,16 @@
             } else {
                 const uziv = odpovedEl.value.trim();
                 
+                // ── Check if input is not a valid number ──
+                if (!jePlatneCislo(uziv)) {
+                    // Vymazat obsah inputu, ukázat placeholder, nepřepínat tlačítko
+                    odpovedEl.value = '';
+                    odpovedEl.placeholder = 'Váš výsledek';
+                    // Tlačítko zůstává na "VÝSLEDEK(kontrola)"
+                    isProcessing = false;
+                    return;
+                }
+
                 if (uziv === '') {
                     // Prázdné pole – vložit správný výsledek naformátovaný do inputu
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
@@ -752,9 +788,39 @@
                 }
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
-                if (history.length > 5) history.pop();
+                // ── ZMĚNA: Neomezujeme počet položek na 5, zobrazujeme celou historii ──
+                // if (history.length > 5) history.pop();  // PŮVODNÍ OMEZENÍ – ODSTRANĚNO
                 renderHistory();
             }
+
+            // ── Funkce pro vymazání historie ──
+            window.clearHistory = function() {
+                history = [];
+                correct = 0;
+                wrong = 0;
+                streak = 0;
+                updateScores();
+                renderHistory();
+                saveState();
+                // Reset input po smazání
+                if (typeof odpovedEl !== 'undefined') {
+                    odpovedEl.value = '';
+                    odpovedEl.placeholder = 'Váš výsledek';
+                }
+                // Reset aktuálního příkladu
+                if (typeof zobrazitVysledek !== 'undefined') {
+                    zobrazitVysledek = false;
+                }
+                if (typeof aktualniPriklad !== 'undefined') {
+                    aktualniPriklad = null;
+                }
+                if (typeof aktualizujTextTlacitka === 'function') {
+                    aktualizujTextTlacitka();
+                }
+                if (typeof updateBtnDisable === 'function') {
+                    updateBtnDisable();
+                }
+            };
 
             function renderHistory() {
                 if (history.length === 0) {
