@@ -431,6 +431,14 @@
 
         odpovedEl.addEventListener('input', updateBtnDisable);
 
+        // Kontrola, zda je vstup platné číslo
+        function jePlatneCislo(vstup) {
+            if (vstup === '') return false;
+            const norm = normalizuj(vstup);
+            if (norm === '') return false;
+            return /^-?\d+([.,]\d*)?$/.test(norm);
+        }
+
         function zkontrolujOdpoved(uzivatelskaOdpoved, priklad) {
             const norm = normalizuj(uzivatelskaOdpoved);
             if (norm === '') return false;
@@ -529,6 +537,10 @@
                         odpovedEl.focus();
                         isProcessing = false;
                     }, 50);
+                } else if (!jePlatneCislo(uziv)) {
+                    chybaEl.textContent = '⚠️ Vložil jste nepovolený znak, opravte!';
+                    isProcessing = false;
+                    setTimeout(() => odpovedEl.focus(), 100);
                 } else {
                     const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
