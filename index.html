@@ -243,7 +243,6 @@
 
                     <!-- Worksheet - compact -->
                     <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl pt-4 px-4 pb-0 mb-3 worksheet-bg relative overflow-hidden flex flex-col justify-center">
-                        <div class="absolute top-2 right-3 text-[8px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest select-none">List</div>
                         <div class="w-full overflow-x-auto scrollbar-hide flex flex-col items-end relative z-10">
                             <div id="priklad" style="white-space: break-spaces;" class="math-text font-mono text-lg tracking-tighter text-slate-700 dark:text-slate-200">Zvolte nastavení a stiskněte ▶ Začít</div>
                             <div id="cara" class="math-text font-mono text-2xl text-slate-400 dark:text-slate-600 border-t-2 border-slate-300 dark:border-slate-600 w-full mt-0.5 opacity-0 transition-opacity duration-300"></div>
@@ -289,7 +288,6 @@
             if (typeof x === 'bigint') return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             if (typeof x !== 'number') return String(x);
             if (Number.isInteger(x)) return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-            // For non-integers, format with spaces in integer part only
             const [cela, des] = x.toString().split('.');
             const celaFmt = cela.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             return des ? `${celaFmt}.${des}` : celaFmt;
@@ -317,7 +315,6 @@
         const tlacitkoEl = document.getElementById('tlacitko');
         const divisionInfo = document.getElementById('divisionInfo');
 
-        // Show division info when division is selected
         operaceEl.addEventListener('change', () => {
             aktualizujCislici2();
             chybaEl.textContent = '';
@@ -355,9 +352,7 @@
             aktualizujCislici2();
         });
 
-        // ── Division helper: truncate to 4 decimal places (no rounding) ──
         function zkratNa4Desetinna(cislo) {
-            // Convert to string, split, truncate decimal part to 4 places
             const str = cislo.toString();
             const [cela, des] = str.split('.');
             if (!des) return cela;
@@ -408,7 +403,6 @@
             const fv = formatujCislo(p.vysledekZobrazeny !== undefined ? p.vysledekZobrazeny : p.vysledek);
             const max = Math.max(fa.length, (p.op + ' ' + fb).length, fv.length);
             prikladEl.textContent = `${fa.padStart(max)}\n${(p.op + ' ' + fb).padStart(max)}`;
-            //caraEl.textContent = '─'.repeat(max);
             caraEl.style.opacity = '0';
         }
 
@@ -421,7 +415,6 @@
         }
 
         function updateBtnDisable() {
-            // Tlačítko už nikdy nedisablujeme – musí být vždy aktivní
             tlacitkoEl.disabled = false;
         }
 
@@ -438,29 +431,23 @@
 
         odpovedEl.addEventListener('input', updateBtnDisable);
 
-        // ── Flexible division answer checking ──
         function zkontrolujOdpoved(uzivatelskaOdpoved, priklad) {
             const norm = normalizuj(uzivatelskaOdpoved);
             if (norm === '') return false;
             
             if (priklad.op === '/') {
-                // For division: allow 3-4 decimal places, compare with truncated values
                 const userNum = parseFloat(norm);
                 if (isNaN(userNum)) return false;
                 
-                // Get the true result truncated to 4 decimal places
                 const trueTruncated = zkratNa4Desetinna(priklad.vysledek);
                 const trueNum = parseFloat(trueTruncated);
                 
-                // Convert user input to string and truncate to 4 decimal places
                 const userStr = norm;
                 const [userCela, userDes = ''] = userStr.split('.');
                 const userDesTruncated = userDes.substring(0, 4);
                 
-                // Compare by truncating both to 4 decimal places
                 const userNumTruncated = parseFloat(userDesTruncated ? `${userCela}.${userDesTruncated}` : userCela);
                 
-                // Also check: if user entered only 3 decimals
                 const userDecimals = userDes.length;
                 if (userDecimals >= 3 && userDecimals <= 4) {
                     const trueDesTruncated = zkratNa4Desetinna(priklad.vysledek).split('.')[1] || '';
@@ -494,7 +481,18 @@
             }
             odpovedEl.classList.remove('zelene', 'cervene');
 
+            const btnText = tlacitkoEl.textContent.trim();
+            const inputText = odpovedEl.value.trim();
+
+            // ── ZAČÍT nebo DALŠÍ PŘÍKLAD ──
             if (!zobrazitVysledek) {
+                // Kontrola slova "smazat" pouze při ZAČÍT
+                if (btnText === 'ZAČÍT' && normalizuj(inputText) === 'smazat') {
+                    if (typeof window.clearHistory === 'function') {
+                        window.clearHistory();
+                    }
+                }
+                
                 const p = vygenerujPriklad();
                 if (!p) {
                     isProcessing = false;
@@ -503,9 +501,9 @@
                 aktualniPriklad = p;
                 zobrazPriklad(p);
                 odpovedEl.value = '';
+                odpovedEl.placeholder = 'Váš výsledek';
                 zobrazitVysledek = true;
                 aktualizujTextTlacitka();
-                // Show division info when entering answer
                 if (p.op === '/') {
                     divisionInfo.classList.remove('hidden');
                 } else {
@@ -516,14 +514,14 @@
                     aktivujPole();
                     isProcessing = false;
                 }, 50);
-            } else {
-                const uziv = odpovedEl.value.trim();
+            } 
+            // ── VÝSLEDEK(kontrola) ──
+            else {
+                const uziv = inputText;
                 
                 if (uziv === '') {
-                    // Prázdné pole – vložit správný výsledek naformátovaný do inputu
                     const vysl = aktualniPriklad.vysledekZobrazeny !== undefined ? aktualniPriklad.vysledekZobrazeny : aktualniPriklad.vysledek;
                     odpovedEl.value = formatujCislo(vysl);
-                    // Nic se nezapisuje do historie ani statistik
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
@@ -532,10 +530,8 @@
                         isProcessing = false;
                     }, 50);
                 } else {
-                    // Vyplněné pole – normální kontrola
                     const spravne = zkontrolujOdpoved(uziv, aktualniPriklad);
                     odpovedEl.classList.add(spravne ? 'zelene' : 'cervene');
-                    // Uživatelův vstup zůstává v poli
                     zobrazitVysledek = false;
                     aktualizujTextTlacitka();
                     divisionInfo.classList.add('hidden');
@@ -752,9 +748,19 @@
                 }
                 if (!text || text.includes('Zvolte nastavení')) return;
                 history.unshift({ text, correct: isCorrect });
-                if (history.length > 5) history.pop();
+                // Bez omezení počtu položek
                 renderHistory();
             }
+
+            window.clearHistory = function() {
+                history = [];
+                correct = 0;
+                wrong = 0;
+                streak = 0;
+                updateScores();
+                renderHistory();
+                saveState();
+            };
 
             function renderHistory() {
                 if (history.length === 0) {
@@ -791,7 +797,6 @@
             });
             problemObserver.observe(prikladEl, { childList: true });
 
-            // Observer for cara visibility
             const caraObserver = new MutationObserver(() => {
                 const isVisible = caraEl.style.opacity === '1';
                 if (isVisible) {
@@ -802,7 +807,6 @@
             });
             caraObserver.observe(caraEl, { attributes: true, attributeFilter: ['style'] });
 
-            // Division operator change observer
             const operaceObserver = document.getElementById('operace');
             const divisionObserver = new MutationObserver(() => {
                 if (operaceObserver.value === '/' && !settingsPanel.classList.contains('collapsed')) {
