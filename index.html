@@ -234,7 +234,7 @@
                         </div>
                         <!-- Division info -->
                         <div id="divisionInfo" class="hidden mt-2 text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
-                            Dělení: výsledek max. na 4 des. místa, odpověď na 1–4 des. míst je OK.
+                            Dělení zobrazí přesně 4 desetinná místa. Odpověď na 1–4 des. místa je uznána.
                         </div>
                     </div>
 
@@ -297,15 +297,6 @@
             return vstup.trim().replace(/\s+/g, '').replace(',', '.');
         }
 
-        // Odstraní koncové nuly z desetinného čísla: "2.5000" → "2.5", "2.5870" → "2.587"
-        function odstranKoncoveNuly(cisloStr) {
-            if (!cisloStr.includes('.')) return cisloStr;
-            const [cela, des] = cisloStr.split('.');
-            if (!des) return cela;
-            const desBezNul = des.replace(/0+$/, '');
-            return desBezNul ? `${cela}.${desBezNul}` : cela;
-        }
-
         function generujCislo(n) {
             const min = Math.pow(10, n - 1);
             const max = Math.pow(10, n) - 1;
@@ -361,16 +352,12 @@
             aktualizujCislici2();
         });
 
-        // Zkrátí na 4 desetinná místa a odstraní koncové nuly
-        function formatujVysledekDeleni(cislo) {
-            // Nejprve zkrátíme na 4 desetinná místa (bez zaokrouhlení)
+        function zkratNa4Desetinna(cislo) {
             const str = cislo.toString();
             const [cela, des] = str.split('.');
             if (!des) return cela;
             const desZkracena = des.substring(0, 4);
-            const se4miMisty = desZkracena ? `${cela}.${desZkracena}` : cela;
-            // Pak odstraníme koncové nuly
-            return odstranKoncoveNuly(se4miMisty);
+            return desZkracena ? `${cela}.${desZkracena}` : cela;
         }
 
         function vygenerujPriklad() {
@@ -405,7 +392,7 @@
                 vysledekZobrazeny = vysledek;
             } else if (op === '/') {
                 vysledek = a / b;
-                vysledekZobrazeny = formatujVysledekDeleni(vysledek);
+                vysledekZobrazeny = zkratNa4Desetinna(vysledek);
             }
             return { a, b, op, vysledek, vysledekZobrazeny };
         }
@@ -457,48 +444,29 @@
             if (norm === '') return false;
             
             if (priklad.op === '/') {
-                // Přesný výsledek dělení jako string s tečkou (plná přesnost)
-                const presnyVysledek = priklad.vysledek.toString();
+                const userNum = parseFloat(norm);
+                if (isNaN(userNum)) return false;
                 
-                // Zobrazený výsledek (pro případ, že by uživatel zadal přesně to)
-                const zobrazenyVysledek = priklad.vysledekZobrazeny.toString();
+                const trueTruncated = zkratNa4Desetinna(priklad.vysledek);
+                const trueNum = parseFloat(trueTruncated);
                 
-                // Odstraníme koncové nuly z uživatelova vstupu pro porovnání
-                const uzivatelBezNul = odstranKoncoveNuly(norm);
+                const userStr = norm;
+                const [userCela, userDes = ''] = userStr.split('.');
+                const userDesTruncated = userDes.substring(0, 4);
                 
-                // Pokud uživatel zadal přesně zobrazený výsledek → OK
-                if (uzivatelBezNul === zobrazenyVysledek) {
-                    return true;
-                }
+                const userNumTruncated = parseFloat(userDesTruncated ? `${userCela}.${userDesTruncated}` : userCela);
                 
-                // Rozdělíme uživatelův vstup
-                const [userCela, userDes = ''] = norm.split('.');
                 const userDecimals = userDes.length;
-                
-                // Pokud má uživatel 0 desetinných míst (celé číslo bez tečky)
-                // nebo více než 4 desetinná místa → musí přesně odpovídat zobrazenému
-                if (userDecimals === 0 || userDecimals > 4) {
-                    return norm === zobrazenyVysledek;
+                if (userDecimals >= 3 && userDecimals <= 4) {
+                    const trueDesTruncated = zkratNa4Desetinna(priklad.vysledek).split('.')[1] || '';
+                    const trueDesToMatch = trueDesTruncated.substring(0, userDecimals);
+                    const trueToMatch = parseFloat(`${zkratNa4Desetinna(priklad.vysledek).split('.')[0]}.${trueDesToMatch}`);
+                    const userToMatch = userNumTruncated;
+                    
+                    return Math.abs(userToMatch - trueToMatch) < 1e-9;
                 }
                 
-                // Uživatel má 1-4 desetinná místa → kontrola začátku přesného výsledku
-                const [presnaCela, presnaDes = ''] = presnyVysledek.split('.');
-                
-                // Celá část musí souhlasit
-                if (userCela !== presnaCela) {
-                    return false;
-                }
-                
-                // Doplníme přesnou desetinnou část nulami na 4 místa, pak odstraníme koncové nuly
-                const presnaDesPadded = presnaDes.padEnd(4, '0');
-                const presnaDesZkracena = presnaDesPadded.substring(0, userDecimals);
-                const presnaDesZkracenaBezNul = odstranKoncoveNuly(`0.${presnaDesZkracena}`).replace('0.', '') || '';
-                
-                // Odstraníme koncové nuly z uživatelova vstupu pro toto porovnání
-                const userDesBezNul = odstranKoncoveNuly(`0.${userDes}`).replace('0.', '') || '';
-                
-                // Porovnáme bez koncových nul
-                return userDesBezNul === presnaDesZkracenaBezNul;
+                return Math.abs(userNumTruncated - trueNum) < 1e-9;
             } else if (typeof priklad.vysledek === 'bigint') {
                 try {
                     return BigInt(norm) === priklad.vysledek;
