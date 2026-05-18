@@ -234,7 +234,7 @@
                         </div>
                         <!-- Division info -->
                         <div id="divisionInfo" class="hidden mt-2 text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
-                            Dělení zobrazí přesně 4 desetinná místa. Odpověď na 1–4 des. místa je uznána.
+                            Dělení: výsledek na 4 des. místa, koncové nuly se nezobrazují. Odpověď 1–4 des. míst uznána.
                         </div>
                     </div>
 
@@ -297,6 +297,15 @@
             return vstup.trim().replace(/\s+/g, '').replace(',', '.');
         }
 
+        // Odstraní koncové nuly z desetinného čísla: "2.5000" → "2.5", "2.5870" → "2.587"
+        function odstranKoncoveNuly(cisloStr) {
+            if (!cisloStr.includes('.')) return cisloStr;
+            const [cela, des] = cisloStr.split('.');
+            if (!des) return cela;
+            const desBezNul = des.replace(/0+$/, '');
+            return desBezNul ? `${cela}.${desBezNul}` : cela;
+        }
+
         function generujCislo(n) {
             const min = Math.pow(10, n - 1);
             const max = Math.pow(10, n) - 1;
@@ -352,12 +361,16 @@
             aktualizujCislici2();
         });
 
-        function zkratNa4Desetinna(cislo) {
+        // Zkrátí na 4 desetinná místa a odstraní koncové nuly
+        function formatujVysledekDeleni(cislo) {
+            // Nejprve zkrátíme na 4 desetinná místa (bez zaokrouhlení)
             const str = cislo.toString();
             const [cela, des] = str.split('.');
             if (!des) return cela;
             const desZkracena = des.substring(0, 4);
-            return desZkracena ? `${cela}.${desZkracena}` : cela;
+            const se4miMisty = desZkracena ? `${cela}.${desZkracena}` : cela;
+            // Pak odstraníme koncové nuly
+            return odstranKoncoveNuly(se4miMisty);
         }
 
         function vygenerujPriklad() {
@@ -392,7 +405,7 @@
                 vysledekZobrazeny = vysledek;
             } else if (op === '/') {
                 vysledek = a / b;
-                vysledekZobrazeny = zkratNa4Desetinna(vysledek);
+                vysledekZobrazeny = formatujVysledekDeleni(vysledek);
             }
             return { a, b, op, vysledek, vysledekZobrazeny };
         }
@@ -444,34 +457,48 @@
             if (norm === '') return false;
             
             if (priklad.op === '/') {
-                // Přesný výsledek dělení jako string s tečkou
+                // Přesný výsledek dělení jako string s tečkou (plná přesnost)
                 const presnyVysledek = priklad.vysledek.toString();
                 
-                // Referenční výsledek zkrácený na 4 desetinná místa (co se zobrazuje)
-                const referencniVysledek = zkratNa4Desetinna(priklad.vysledek);
+                // Zobrazený výsledek (pro případ, že by uživatel zadal přesně to)
+                const zobrazenyVysledek = priklad.vysledekZobrazeny.toString();
                 
-                // Zjistíme, kolik desetinných míst uživatel zadal
+                // Odstraníme koncové nuly z uživatelova vstupu pro porovnání
+                const uzivatelBezNul = odstranKoncoveNuly(norm);
+                
+                // Pokud uživatel zadal přesně zobrazený výsledek → OK
+                if (uzivatelBezNul === zobrazenyVysledek) {
+                    return true;
+                }
+                
+                // Rozdělíme uživatelův vstup
                 const [userCela, userDes = ''] = norm.split('.');
                 const userDecimals = userDes.length;
                 
-                // Uživatel zadal 1-4 desetinných míst - zkontrolujeme, zda odpovídají začátku přesného výsledku
-                if (userDecimals >= 1 && userDecimals <= 4) {
-                    // Rozdělíme přesný výsledek
-                    const [presnaCela, presnaDes = ''] = presnyVysledek.split('.');
-                    
-                    // Celá část musí souhlasit
-                    if (userCela !== presnaCela) {
-                        return false;
-                    }
-                    
-                    // Desetinná část uživatele musí odpovídat začátku přesné desetinné části
-                    const presnaDesZkracena = presnaDes.substring(0, userDecimals);
-                    return userDes === presnaDesZkracena;
+                // Pokud má uživatel 0 desetinných míst (celé číslo bez tečky)
+                // nebo více než 4 desetinná místa → musí přesně odpovídat zobrazenému
+                if (userDecimals === 0 || userDecimals > 4) {
+                    return norm === zobrazenyVysledek;
                 }
                 
-                // Uživatel zadal 0 desetinných míst (celé číslo) nebo více než 4
-                // Musí přesně odpovídat zobrazenému výsledku na 4 desetinná místa
-                return norm === referencniVysledek;
+                // Uživatel má 1-4 desetinná místa → kontrola začátku přesného výsledku
+                const [presnaCela, presnaDes = ''] = presnyVysledek.split('.');
+                
+                // Celá část musí souhlasit
+                if (userCela !== presnaCela) {
+                    return false;
+                }
+                
+                // Doplníme přesnou desetinnou část nulami na 4 místa, pak odstraníme koncové nuly
+                const presnaDesPadded = presnaDes.padEnd(4, '0');
+                const presnaDesZkracena = presnaDesPadded.substring(0, userDecimals);
+                const presnaDesZkracenaBezNul = odstranKoncoveNuly(`0.${presnaDesZkracena}`).replace('0.', '') || '';
+                
+                // Odstraníme koncové nuly z uživatelova vstupu pro toto porovnání
+                const userDesBezNul = odstranKoncoveNuly(`0.${userDes}`).replace('0.', '') || '';
+                
+                // Porovnáme bez koncových nul
+                return userDesBezNul === presnaDesZkracenaBezNul;
             } else if (typeof priklad.vysledek === 'bigint') {
                 try {
                     return BigInt(norm) === priklad.vysledek;
