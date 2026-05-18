@@ -444,29 +444,34 @@
             if (norm === '') return false;
             
             if (priklad.op === '/') {
-                const userNum = parseFloat(norm);
-                if (isNaN(userNum)) return false;
+                // Přesný výsledek dělení jako string s tečkou
+                const presnyVysledek = priklad.vysledek.toString();
                 
-                const trueTruncated = zkratNa4Desetinna(priklad.vysledek);
-                const trueNum = parseFloat(trueTruncated);
+                // Referenční výsledek zkrácený na 4 desetinná místa (co se zobrazuje)
+                const referencniVysledek = zkratNa4Desetinna(priklad.vysledek);
                 
-                const userStr = norm;
-                const [userCela, userDes = ''] = userStr.split('.');
-                const userDesTruncated = userDes.substring(0, 4);
-                
-                const userNumTruncated = parseFloat(userDesTruncated ? `${userCela}.${userDesTruncated}` : userCela);
-                
+                // Zjistíme, kolik desetinných míst uživatel zadal
+                const [userCela, userDes = ''] = norm.split('.');
                 const userDecimals = userDes.length;
-                if (userDecimals >= 3 && userDecimals <= 4) {
-                    const trueDesTruncated = zkratNa4Desetinna(priklad.vysledek).split('.')[1] || '';
-                    const trueDesToMatch = trueDesTruncated.substring(0, userDecimals);
-                    const trueToMatch = parseFloat(`${zkratNa4Desetinna(priklad.vysledek).split('.')[0]}.${trueDesToMatch}`);
-                    const userToMatch = userNumTruncated;
+                
+                // Uživatel zadal 1-4 desetinných míst - zkontrolujeme, zda odpovídají začátku přesného výsledku
+                if (userDecimals >= 1 && userDecimals <= 4) {
+                    // Rozdělíme přesný výsledek
+                    const [presnaCela, presnaDes = ''] = presnyVysledek.split('.');
                     
-                    return Math.abs(userToMatch - trueToMatch) < 1e-9;
+                    // Celá část musí souhlasit
+                    if (userCela !== presnaCela) {
+                        return false;
+                    }
+                    
+                    // Desetinná část uživatele musí odpovídat začátku přesné desetinné části
+                    const presnaDesZkracena = presnaDes.substring(0, userDecimals);
+                    return userDes === presnaDesZkracena;
                 }
                 
-                return Math.abs(userNumTruncated - trueNum) < 1e-9;
+                // Uživatel zadal 0 desetinných míst (celé číslo) nebo více než 4
+                // Musí přesně odpovídat zobrazenému výsledku na 4 desetinná místa
+                return norm === referencniVysledek;
             } else if (typeof priklad.vysledek === 'bigint') {
                 try {
                     return BigInt(norm) === priklad.vysledek;
